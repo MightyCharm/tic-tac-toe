@@ -10,7 +10,7 @@
 // Object to control the flow of the game
 const game = (function () {
     // check board if a player has won the game
-    
+
 
     const shufflePlayerStartPosition = (arr) => {
         let shuffledArray = arr
@@ -20,9 +20,7 @@ const game = (function () {
         return shuffledArray;
     }
 
-    const turn = () => {
-       
-    }
+
 
     return { shufflePlayerStartPosition };
 })();
@@ -33,14 +31,40 @@ const game = (function () {
 const gameboard = (function () {
     let board =
         [
-            ["", "", ""],
-            ["", "", ""],
-            ["", "", ""]
+            ["-", "-", "-"],
+            ["-", "-", "-"],
+            ["-", "-", "-"]
         ];
 
     // update board
 
-    return { board };
+    const setBoard = (turn, sign) => {
+        let arrTurn = turn.split(" ");
+        let firstTurn = arrTurn[0];
+        let secondTurn = arrTurn[1];
+        //console.log(`firstTurn: ${firstTurn}`);
+        //console.log(`secondTurn: ${secondTurn}`);
+        for (let i = 0; i < board.length; i++) {
+            for (let j = 0; j < board[i].length; j++) {
+                if (i == firstTurn && j == secondTurn) {
+                    board[i][j] = sign;
+                }
+            }
+        }
+    }
+
+    const getBoard = () => {
+        let formattedBoard = "";
+        for (let i = 0; i < board.length; i++) {
+            for (let j=0; j < board[i].length; j++) {
+                formattedBoard += board[i][j];
+            }
+            formattedBoard += "\n";
+        }
+        return formattedBoard;
+    };
+
+    return { setBoard, getBoard };
 })();
 
 
@@ -49,11 +73,20 @@ const gameboard = (function () {
 const player = function (playerName, playerSign) {
     const name = playerName;
     const sign = playerSign;
+    let input;
 
     const getName = () => name;
     const getSign = () => sign;
 
-    return { getName, getSign };
+    const setTurn = () => {
+        input = prompt("Enter your turn (pos1 pos2)");
+    }
+
+    const getTurn = () => {
+        return input;
+    }
+
+    return { getName, getSign, setTurn, getTurn };
 }
 
 
@@ -69,7 +102,7 @@ let shuffledArray = game.shufflePlayerStartPosition(tempArr);
 // create two player object
 let player1 = player(shuffledArray[0], "X");
 let player2 = player(shuffledArray[1], "O");
-// create game
+
 
 
 // create board
@@ -78,10 +111,14 @@ console.log(`${player2.getName()} ${player2.getSign()}`);
 console.log(typeof player1);
 
 let turnPlayer1;
+
+// objects: game, gameboard, player 
 while (true) {
     // player1 makes turn
-
-
+    player1.setTurn();
+    console.log(`Player1: ${player1.getName()} turn: ${player1.getTurn()}`)
+    gameboard.setBoard(player1.getTurn(), player1.getSign());
+    console.log(gameboard.getBoard());
 
     // player2 makes turn
     break
