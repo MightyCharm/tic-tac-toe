@@ -10,15 +10,21 @@
 // Object to control the flow of the game
 const game = (function () {
     // check board if a player has won the game
-    let playerTurn;
     
-    const turn = (name) => {
-        console.log(` get input from ${name}`);
-        playerTurn = prompt("Enter your turn");
-        return playerTurn;
+
+    const shufflePlayerStartPosition = (arr) => {
+        let shuffledArray = arr
+            .map(value => ({ value, sort: Math.random() }))
+            .sort((a, b) => a.sort - b.sort)
+            .map(({ value }) => value);
+        return shuffledArray;
     }
 
-    return { turn };
+    const turn = () => {
+       
+    }
+
+    return { shufflePlayerStartPosition };
 })();
 
 // Gameboard Object
@@ -40,10 +46,14 @@ const gameboard = (function () {
 
 // PLayer Object
 // Player also be stored in an Object
-const player = function (playerName) {
+const player = function (playerName, playerSign) {
     const name = playerName;
+    const sign = playerSign;
 
-    return { name };
+    const getName = () => name;
+    const getSign = () => sign;
+
+    return { getName, getSign };
 }
 
 
@@ -52,35 +62,28 @@ const player = function (playerName) {
 const userName1 = "Sebastian";
 const userName2 = "Peter";
 
-// randomly decide which player starts
+// put both names in array to randomly generate starting position
 let tempArr = [userName1, userName2];
-let shuffledArray = tempArr
-    .map(value => ({ value, sort: Math.random() }))
-    .sort((a, b) => a.sort - b.sort)
-    .map(({ value }) => value)
-//console.log(shuffledArray);
-// create two players
-let player1 = player(shuffledArray[0]);
-let player2 = player(shuffledArray[1]);
+let shuffledArray = game.shufflePlayerStartPosition(tempArr);
+
+// create two player object
+let player1 = player(shuffledArray[0], "X");
+let player2 = player(shuffledArray[1], "O");
 // create game
 
 
 // create board
-
-console.log(player1.name);
+console.log(`${player1.getName()} ${player1.getSign()}`);
+console.log(`${player2.getName()} ${player2.getSign()}`);
+console.log(typeof player1);
 
 let turnPlayer1;
 while (true) {
     // player1 makes turn
-    turnPlayer1 = game.turn(player1.name);
-    console.log(turnPlayer1);
-    // check for win
+
+
 
     // player2 makes turn
-    game.turn(player2.name);
-    // check for win
-
-
     break
 }
 
