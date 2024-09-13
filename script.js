@@ -16,16 +16,22 @@ const game = (function () {
     }
 
     const getTurn = (player) => {
-        player.setTurn();
+        player.getTurn();
     }
 
     const setTurn = (player) => {
         gameBoard.setBoard(player);
     }
 
+    // get array board
     const getBoard = () => {
         //console.log(gameBoard.getBoard());
         return gameBoard.getBoard();
+    }
+
+    // get print output for terminal
+    const outputBoard = () => {
+        return gameBoard.outputBoard();
     }
 
     const checkForWinner = (player) => {
@@ -33,15 +39,15 @@ const game = (function () {
         let result;
         // if one check is true cancel rest return true (winner was found)
         // if all checks are false, return false (no winner was found)
-        
+
         result = gameBoard.checkRows(player);
         console.log(`1) check rows              => result: ${result}`);
         if (result === true) return result;
-        
+
         result = gameBoard.checkColumns(player);
         console.log(`2) check columns           => result: ${result}`);
         if (result === true) return result;
-        
+
         result = gameBoard.checkCrossLeftToRight(player);
         console.log(`3) check cross left/right  => result: ${result}`);
         if (result === true) return result;
@@ -49,16 +55,14 @@ const game = (function () {
         result = gameBoard.checkCrossRightToLeft(player);
         console.log(`4) check cross right/left  => result: ${result}`);
         return result;
-        
+
     }
 
     const gameOver = (player) => {
         console.log(`${player.getName()} ${player.getSign()} won the game! GAME OVER!`);
     }
 
-
-
-    return { shufflePlayerStartPosition, getTurn, setTurn, getBoard, checkForWinner, gameOver };
+    return { shufflePlayerStartPosition, getTurn, setTurn, getBoard, outputBoard, checkForWinner, gameOver };
 })();
 
 // Gameboard Object
@@ -66,12 +70,12 @@ const gameBoard = (function () {
     let board =
         [
             ["", "", ""],
-            ["", "", ""],
+            ["", "X", ""],
             ["", "", ""]
         ];
 
     const setBoard = (player) => {
-        let turn = player.getTurn();
+        let turn = player.setTurn();
         let arrTurn = turn.split(" ");
         let firstTurn = arrTurn[0];
         let secondTurn = arrTurn[1];
@@ -79,17 +83,24 @@ const gameBoard = (function () {
             for (let j = 0; j < board[i].length; j++) {
                 if (i == firstTurn && j == secondTurn) {
                     board[i][j] = player.getSign();
+                    return;
                 }
             }
         }
     }
 
+    // get array board
     const getBoard = () => {
+        return board;
+    }
+
+    // get print output for terminal
+    const outputBoard = () => {
         let formattedBoard = "";
         for (let i = 0; i < board.length; i++) {
             for (let j = 0; j < board[i].length; j++) {
                 if (board[i][j] === "") {
-                    formattedBoard += " ";
+                    formattedBoard += "-";
                     continue;
                 }
                 formattedBoard += board[i][j];
@@ -100,7 +111,7 @@ const gameBoard = (function () {
     };
 
     const checkRows = (player) => {
-        let playerSign = player.getSign();     
+        let playerSign = player.getSign();
         let previousIteration;
         let currentIteration;
         let winner = true;
@@ -148,10 +159,10 @@ const gameBoard = (function () {
                 }
                 currentIteration = board[i][j];
 
-                 // checks for not equality | for empty strings | for inequality with player sign
+                // checks for not equality | for empty strings | for inequality with player sign
                 if ((previousIteration != currentIteration) ||
-                   (previousIteration === "" && currentIteration === "") ||
-                   (previousIteration != playerSign) || currentIteration != playerSign) {
+                    (previousIteration === "" && currentIteration === "") ||
+                    (previousIteration != playerSign) || currentIteration != playerSign) {
                     winner = false;
                     break;
                 }
@@ -224,7 +235,7 @@ const gameBoard = (function () {
         return winner;
     }
 
-    return { setBoard, getBoard, checkRows, checkColumns, checkCrossLeftToRight, checkCrossRightToLeft };
+    return { setBoard, getBoard, outputBoard, checkRows, checkColumns, checkCrossLeftToRight, checkCrossRightToLeft };
 })();
 
 
@@ -237,13 +248,33 @@ const player = function (playerName, playerSign) {
     const getName = () => name;
     const getSign = () => sign;
 
-    const setTurn = () => {
-        input = prompt("Enter your turn (pos1 pos2)");
-        //input = "0 0";
-        console.log("inside player.setTurn() set input to fixed value, rm later for prompt again")
+    const getTurn = () => {
+        let board = gameBoard.getBoard();
+        let correctInput = false;
+        do {
+            
+            input = prompt("Enter your turn (pos1 pos2)");
+            let arrTurn = input.split(" ");
+            let firstTurn = arrTurn[0];
+            let secondTurn = arrTurn[1];
+
+            // check if user input is bigger than max length of array and array in array
+            if (firstTurn > board.length || secondTurn > board[0].length) {
+                continue;
+            } 
+            // check if position is empty
+            if (board[firstTurn][secondTurn] == "") {
+                correctInput = true;
+            }
+
+            
+            
+            
+            console.log("inside player.setTurn() set input to fixed value, rm later for prompt again")
+        }while (!correctInput);
     }
 
-    const getTurn = () => {
+    const setTurn = () => {
         return input;
     }
 
@@ -265,6 +296,7 @@ let player2 = player(shuffledArray[1], "O");
 //console.log(`Player1: ${player1.getName()} ${player1.getSign()}`);
 //console.log(`Player2: ${player2.getName()} ${player2.getSign()}`);
 
+
 // objects: game, gameBoard, player
 let winnerFound;
 let count = 0;
@@ -273,7 +305,9 @@ while (count < 5) {
     //player1.setTurn();
     game.getTurn(player1);
     game.setTurn(player1);
-    console.log(game.getBoard());
+    
+    console.log(game.outputBoard());
+    /*
     // check for winner
     winnerFound = game.checkForWinner(player1);
     
@@ -287,5 +321,10 @@ while (count < 5) {
     }
     // player2 makes turn
     
-    count++   
+    count++
+    */
+    break
 }
+
+
+
