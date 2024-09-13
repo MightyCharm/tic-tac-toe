@@ -41,19 +41,19 @@ const game = (function () {
         // if all checks are false, return false (no winner was found)
 
         result = gameBoard.checkRows(player);
-        console.log(`1) check rows              => result: ${result}`);
+        //console.log(`1) check rows              => result: ${result}`);
         if (result === true) return result;
 
         result = gameBoard.checkColumns(player);
-        console.log(`2) check columns           => result: ${result}`);
+        // console.log(`2) check columns           => result: ${result}`);
         if (result === true) return result;
 
         result = gameBoard.checkCrossLeftToRight(player);
-        console.log(`3) check cross left/right  => result: ${result}`);
+        // console.log(`3) check cross left/right  => result: ${result}`);
         if (result === true) return result;
 
         result = gameBoard.checkCrossRightToLeft(player);
-        console.log(`4) check cross right/left  => result: ${result}`);
+        // console.log(`4) check cross right/left  => result: ${result}`);
         return result;
 
     }
@@ -70,7 +70,7 @@ const gameBoard = (function () {
     let board =
         [
             ["", "", ""],
-            ["", "X", ""],
+            ["", "", ""],
             ["", "", ""]
         ];
 
@@ -265,12 +265,7 @@ const player = function (playerName, playerSign) {
             // check if position is empty
             if (board[firstTurn][secondTurn] == "") {
                 correctInput = true;
-            }
-
-            
-            
-            
-            console.log("inside player.setTurn() set input to fixed value, rm later for prompt again")
+            }     
         }while (!correctInput);
     }
 
@@ -300,14 +295,17 @@ let player2 = player(shuffledArray[1], "O");
 // objects: game, gameBoard, player
 let winnerFound;
 let count = 0;
+console.log("TIC TAC TOE");
+console.log(game.outputBoard());
 while (count < 5) {
     // player1 makes turn
     //player1.setTurn();
     game.getTurn(player1);
-    game.setTurn(player1);
-    
+    game.setTurn(player1); 
+
+    console.clear();
     console.log(game.outputBoard());
-    /*
+
     // check for winner
     winnerFound = game.checkForWinner(player1);
     
@@ -320,10 +318,27 @@ while (count < 5) {
         console.log(`No winner! continue!`);
     }
     // player2 makes turn
+    game.getTurn(player2);
+    game.setTurn(player2);
+    
+    //console.clear();
+    console.clear();
+    console.log(game.outputBoard());
+
+    // check for winner
+    winnerFound = game.checkForWinner(player2);
+    
+    
+    if (winnerFound === true) {
+        //game.gameOver(player1);
+        console.log(`Player2 won! winnerFound: ${winnerFound}. GameOver!`);
+        break;
+    } else {
+        console.log(`No winner! continue!`);
+    }
     
     count++
-    */
-    break
+
 }
 
 
