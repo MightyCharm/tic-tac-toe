@@ -4,8 +4,6 @@
 
 // Game Object for the flow of the game
 const game = (function () {
-    // check board if a player has won the game
-
 
     const shufflePlayerStartPosition = (arr) => {
         let shuffledArray = arr
@@ -58,11 +56,14 @@ const game = (function () {
 
     }
 
-    const gameOver = (player) => {
-        console.log(`${player.getName()} ${player.getSign()} won the game! GAME OVER!`);
+    const checkForEmptySpot = () => {
+        // check if board has at least on empty spot left
+        let result;
+        result = gameBoard.checkForEmptySpot();
+        return result;
     }
 
-    return { shufflePlayerStartPosition, getTurn, setTurn, getBoard, outputBoard, checkForWinner, gameOver };
+    return { shufflePlayerStartPosition, getTurn, setTurn, getBoard, outputBoard, checkForWinner, checkForEmptySpot };
 })();
 
 // Gameboard Object
@@ -235,7 +236,24 @@ const gameBoard = (function () {
         return winner;
     }
 
-    return { setBoard, getBoard, outputBoard, checkRows, checkColumns, checkCrossLeftToRight, checkCrossRightToLeft };
+    const checkForEmptySpot = () => {
+        // iterate over array to find at least one "" empty spot
+        // if empty spot is found return true
+        // if no empty spot is found return false
+        let emptySpace = false;
+        for (let i = 0; i < board.length; i++) {
+            for (let j = 0; j < board[i].length; j++) {
+                if (board[i][j] === "") {
+                    emptySpace = true;
+                    return emptySpace;
+                }
+            }
+        }
+
+        return emptySpace;
+    }
+
+    return { setBoard, getBoard, outputBoard, checkRows, checkColumns, checkCrossLeftToRight, checkCrossRightToLeft, checkForEmptySpot };
 })();
 
 
@@ -259,7 +277,11 @@ const player = function (playerName, playerSign) {
             let secondTurn = arrTurn[1];
 
             // check if user input is bigger than max length of array and array in array
-            if (firstTurn > board.length || secondTurn > board[0].length) {
+            if (firstTurn > board.length-1 || secondTurn > board[0].length-1) {
+                continue;
+            }
+            // check if user input is smaller than 0 index
+            if (firstTurn < 0 || secondTurn < 0) {
                 continue;
             } 
             // check if position is empty
@@ -297,19 +319,21 @@ let winnerFound;
 let count = 0;
 console.log("TIC TAC TOE");
 console.log(game.outputBoard());
-while (count < 5) {
-    // player1 makes turn
-    //player1.setTurn();
+while (count < 20) {
+    // FIRST PLAYER
+    // 1. check if board has at least on empty spot left
+    if(game.checkForEmptySpot() === false) {
+        console.log("Board is full. No Winner! Game Over");
+        break;
+    }
+    // 2. player1 enters turn and turn is set into board array
     game.getTurn(player1);
-    game.setTurn(player1); 
-
+    game.setTurn(player1);
+    // 3. clear console and output board 
     console.clear();
     console.log(game.outputBoard());
-
-    // check for winner
-    winnerFound = game.checkForWinner(player1);
-    
-    
+    // 4. check for winner
+    winnerFound = game.checkForWinner(player1); 
     if (winnerFound === true) {
         //game.gameOver(player1);
         console.log(`Player1 won! winnerFound: ${winnerFound}. GameOver!`);
@@ -317,18 +341,23 @@ while (count < 5) {
     } else {
         console.log(`No winner! continue!`);
     }
-    // player2 makes turn
+
+    // SECOND PLAYER
+    // 1. check if board has at least on empty spot left
+    if(game.checkForEmptySpot() === false) {
+        console.log("Board is full. No Winner! Game Over");
+        break;
+    }
+    // 2. player2 enters turn and turn is set into board array
     game.getTurn(player2);
     game.setTurn(player2);
     
-    //console.clear();
+    // 3. clear console and output board 
     console.clear();
     console.log(game.outputBoard());
 
-    // check for winner
+    // 4. check for winner
     winnerFound = game.checkForWinner(player2);
-    
-    
     if (winnerFound === true) {
         //game.gameOver(player1);
         console.log(`Player2 won! winnerFound: ${winnerFound}. GameOver!`);
@@ -336,10 +365,6 @@ while (count < 5) {
     } else {
         console.log(`No winner! continue!`);
     }
-    
     count++
 
 }
-
-
-
