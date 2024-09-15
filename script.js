@@ -4,7 +4,35 @@
 
 // Object for displaying the game on the page
 // - function that will render the content of the gameboard array to the webpage
+const buttons = document.querySelectorAll("#btn");
+buttons.forEach((btn) => {
+    btn.addEventListener("click", (event) => {
+        const btn = event.target;
+        console.log(btn.getAttribute("data-id"));
+    })
+})
 
+connectGUI = (function () {
+    const renderBoard = () => {
+        const board = game.getBoard();
+        let index = 0;
+        for (let i = 0; i < board.length; i++) {
+            
+            for (let j = 0; j < board[i].length; j++) {
+                
+                if(board[i][j] != "") {
+                    console.log(board[i][j]);
+                    buttons[index].innerHTML = board[i][j];
+                }
+                index++;
+                
+            }
+        }
+        console.log(index)
+    }
+
+    return { renderBoard };
+})();
 
 // Game factory function (for the flow of the game)
 const game = (function () {
@@ -75,9 +103,9 @@ const game = (function () {
 const gameBoard = (function () {
     let board =
         [
-            ["", "", ""],
-            ["", "", ""],
-            ["", "", ""]
+            ["1", "2", "3"],
+            ["4", "5", "6"],
+            ["7", "8", "9"]
         ];
 
     const setBoard = (player) => {
@@ -303,6 +331,13 @@ const player = function (playerName, playerSign) {
     return { getName, getSign, setTurn, getTurn };
 }
 
+
+// test render gameboard method
+connectGUI.renderBoard();
+
+
+
+/*
 // get player names
 const userName1 = "Sebastian";
 const userName2 = "Peter";
@@ -366,3 +401,4 @@ while (winnerFound === false) {
         console.log(`No winner! continue!`);
     }
 }
+    */
