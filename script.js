@@ -2,9 +2,14 @@
 // everything clickable should be a button, for accessibility reasons
 // using factory functions
 
-// Game Object for the flow of the game
+// Object for displaying the game on the page
+// - function that will render the content of the gameboard array to the webpage
+
+
+// Game factory function (for the flow of the game)
 const game = (function () {
 
+    // don't need that in UI
     const shufflePlayerStartPosition = (arr) => {
         let shuffledArray = arr
             .map(value => ({ value, sort: Math.random() }))
@@ -21,13 +26,13 @@ const game = (function () {
         gameBoard.setBoard(player);
     }
 
-    // get array board
+    // get variable board
     const getBoard = () => {
         //console.log(gameBoard.getBoard());
         return gameBoard.getBoard();
     }
 
-    // get print output for terminal
+    // get output for terminal
     const outputBoard = () => {
         return gameBoard.outputBoard();
     }
@@ -56,8 +61,8 @@ const game = (function () {
 
     }
 
+    // check if board has at least one empty spot
     const checkForEmptySpot = () => {
-        // check if board has at least on empty spot left
         let result;
         result = gameBoard.checkForEmptySpot();
         return result;
@@ -66,7 +71,7 @@ const game = (function () {
     return { shufflePlayerStartPosition, getTurn, setTurn, getBoard, outputBoard, checkForWinner, checkForEmptySpot };
 })();
 
-// Gameboard Object
+// Gameboard factory function
 const gameBoard = (function () {
     let board =
         [
@@ -90,12 +95,12 @@ const gameBoard = (function () {
         }
     }
 
-    // get array board
+    // get variable board
     const getBoard = () => {
         return board;
     }
 
-    // get print output for terminal
+    // get output for terminal
     const outputBoard = () => {
         let formattedBoard = "";
         for (let i = 0; i < board.length; i++) {
@@ -257,7 +262,7 @@ const gameBoard = (function () {
 })();
 
 
-// PLayer Object
+// Player factory function
 const player = function (playerName, playerSign) {
     const name = playerName;
     const sign = playerSign;
@@ -270,25 +275,25 @@ const player = function (playerName, playerSign) {
         let board = gameBoard.getBoard();
         let correctInput = false;
         do {
-            
+
             input = prompt("Enter your turn (pos1 pos2)");
             let arrTurn = input.split(" ");
             let firstTurn = arrTurn[0];
             let secondTurn = arrTurn[1];
 
             // check if user input is bigger than max length of array and array in array
-            if (firstTurn > board.length-1 || secondTurn > board[0].length-1) {
+            if (firstTurn > board.length - 1 || secondTurn > board[0].length - 1) {
                 continue;
             }
             // check if user input is smaller than 0 index
             if (firstTurn < 0 || secondTurn < 0) {
                 continue;
-            } 
+            }
             // check if position is empty
             if (board[firstTurn][secondTurn] == "") {
                 correctInput = true;
-            }     
-        }while (!correctInput);
+            }
+        } while (!correctInput);
     }
 
     const setTurn = () => {
@@ -310,19 +315,14 @@ let shuffledArray = game.shufflePlayerStartPosition(tempArr);
 let player1 = player(shuffledArray[0], "X");
 let player2 = player(shuffledArray[1], "O");
 
-//console.log(`Player1: ${player1.getName()} ${player1.getSign()}`);
-//console.log(`Player2: ${player2.getName()} ${player2.getSign()}`);
-
-
-// objects: game, gameBoard, player
-let winnerFound;
-let count = 0;
+let winnerFound = false;
 console.log("TIC TAC TOE");
 console.log(game.outputBoard());
-while (count < 20) {
+// main loop (I think I don't need that in GUI)
+while (winnerFound === false) {
     // FIRST PLAYER
     // 1. check if board has at least on empty spot left
-    if(game.checkForEmptySpot() === false) {
+    if (game.checkForEmptySpot() === false) {
         console.log("Board is full. No Winner! Game Over");
         break;
     }
@@ -333,7 +333,7 @@ while (count < 20) {
     console.clear();
     console.log(game.outputBoard());
     // 4. check for winner
-    winnerFound = game.checkForWinner(player1); 
+    winnerFound = game.checkForWinner(player1);
     if (winnerFound === true) {
         //game.gameOver(player1);
         console.log(`Player1 won! winnerFound: ${winnerFound}. GameOver!`);
@@ -344,14 +344,14 @@ while (count < 20) {
 
     // SECOND PLAYER
     // 1. check if board has at least on empty spot left
-    if(game.checkForEmptySpot() === false) {
+    if (game.checkForEmptySpot() === false) {
         console.log("Board is full. No Winner! Game Over");
         break;
     }
     // 2. player2 enters turn and turn is set into board array
     game.getTurn(player2);
     game.setTurn(player2);
-    
+
     // 3. clear console and output board 
     console.clear();
     console.log(game.outputBoard());
@@ -365,6 +365,4 @@ while (count < 20) {
     } else {
         console.log(`No winner! continue!`);
     }
-    count++
-
 }
