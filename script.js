@@ -8,11 +8,13 @@ const buttons = document.querySelectorAll("#btn");
 buttons.forEach((btn) => {
     btn.addEventListener("click", (event) => {
         const btn = event.target;
-        console.log(btn.getAttribute("data-id"));
+        //console.log(btn.getAttribute("data-id"));
+        connectGUI.setPlayerSign(btn);
     })
 })
 
 connectGUI = (function () {
+
     const renderBoard = () => {
         const board = game.getBoard();
         let index = 0;
@@ -31,13 +33,34 @@ connectGUI = (function () {
         console.log(index)
     }
 
-    return { renderBoard };
+    // work in progress
+    const setPlayerSign = (btn) =>  {
+        //console.log(btn.getAttribute("data-id"));
+        // 1. check if button that was pressed is empty
+        let empty = game.checkForEmptyButton(btn);
+        console.log(`empty button: ${empty}`);
+        // if button was not empty, check if there is at least on button empty on the gameboard
+        if (empty === false) {
+            return
+        };
+        // 2. if button was empty get Player Sign and Insert it into Button
+        game.setTurn(btn);
+        console.log(game.outputBoard());
+        // 3. Check for winning condition
+
+        // 4. check for empty spot on board
+        //    if no empty spot..game over and no winner
+        //console.log(game. checkForEmptySpot());
+
+    }
+
+    return { renderBoard, setPlayerSign };
 })();
 
 // Game factory function (for the flow of the game)
 const game = (function () {
 
-    // don't need that in UI
+    // i don't need that in UI
     const shufflePlayerStartPosition = (arr) => {
         let shuffledArray = arr
             .map(value => ({ value, sort: Math.random() }))
@@ -46,12 +69,14 @@ const game = (function () {
         return shuffledArray;
     }
 
+    // i don't need that in UI
     const getTurn = (player) => {
         player.getTurn();
     }
 
-    const setTurn = (player) => {
-        gameBoard.setBoard(player);
+    // set player sign
+    const setTurn = (btn) => {
+        gameBoard.setBoard(btn);
     }
 
     // get variable board
@@ -60,6 +85,7 @@ const game = (function () {
         return gameBoard.getBoard();
     }
 
+    // i don't need that in UI
     // get output for terminal
     const outputBoard = () => {
         return gameBoard.outputBoard();
@@ -89,6 +115,13 @@ const game = (function () {
 
     }
 
+    // check if button that was pressed is empty or not
+    const checkForEmptyButton = (btn) => {
+        let content = btn.innerHTML;
+        if (content === "") return true
+        return false;
+    }
+
     // check if board has at least one empty spot
     const checkForEmptySpot = () => {
         let result;
@@ -96,19 +129,43 @@ const game = (function () {
         return result;
     }
 
-    return { shufflePlayerStartPosition, getTurn, setTurn, getBoard, outputBoard, checkForWinner, checkForEmptySpot };
+
+    return { shufflePlayerStartPosition, getTurn, setTurn, getBoard, outputBoard, checkForWinner, checkForEmptyButton ,checkForEmptySpot };
 })();
 
 // Gameboard factory function
 const gameBoard = (function () {
+    let lastSignSet = "";
     let board =
         [
-            ["1", "2", "3"],
-            ["4", "5", "6"],
-            ["7", "8", "9"]
+            ["", "", ""],
+            ["", "", ""],
+            ["", "", ""]
         ];
 
-    const setBoard = (player) => {
+    const setBoard = (btn) => {
+        // 1. set player input in GUI
+        // 2. set player input in board array
+        let data_id = btn.getAttribute("data-id").split(" "); // get data-id from button(=equal to index in board array)
+        let index_1 = data_id[0];
+        let index_2 = data_id[1];
+        //console.log(`index_1: ${index_1} index_2: ${index_2}`);
+        // console.log(`btn: ${btn.getAttribute("data-id")}`);
+        if (lastSignSet === "") {
+            btn.innerHTML = player1.getSign();
+            lastSignSet = player1.getSign();
+            board[index_1][index_2] = player1.getSign();
+        } else if (lastSignSet === "X") {
+            btn.innerHTML = player2.getSign();
+            lastSignSet = player2.getSign();
+            board[index_1][index_2] = player2.getSign();
+        } else {
+            btn.innerHTML = player1.getSign();
+            lastSignSet = player1.getSign();
+            board[index_1][index_2] = player1.getSign();
+        }
+        // 2. set player input in array
+        /*
         let turn = player.setTurn();
         let arrTurn = turn.split(" ");
         let firstTurn = arrTurn[0];
@@ -121,6 +178,7 @@ const gameBoard = (function () {
                 }
             }
         }
+        */
     }
 
     // get variable board
@@ -291,8 +349,8 @@ const gameBoard = (function () {
 
 
 // Player factory function
-const player = function (playerName, playerSign) {
-    const name = playerName;
+const player = function (playerSign) {
+    let name;
     const sign = playerSign;
     let input;
 
@@ -334,7 +392,10 @@ const player = function (playerName, playerSign) {
 
 // test render gameboard method
 connectGUI.renderBoard();
-
+const player1 = player("X");
+const player2 = player("O");
+console.log(player1.getSign());
+console.log(player2.getSign());
 
 
 /*
