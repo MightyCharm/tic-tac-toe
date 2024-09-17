@@ -7,6 +7,7 @@
 const buttons = document.querySelectorAll("#btn");
 buttons.forEach((btn) => {
     btn.addEventListener("click", (event) => {
+        // console.log("button clicked");
         const btn = event.target;
         //console.log(btn.getAttribute("data-id"));
         connectGUI.setPlayerSign(btn);
@@ -23,14 +24,14 @@ connectGUI = (function () {
             for (let j = 0; j < board[i].length; j++) {
                 
                 if(board[i][j] != "") {
-                    console.log(board[i][j]);
+                    // console.log(board[i][j]);
                     buttons[index].innerHTML = board[i][j];
                 }
                 index++;
                 
             }
         }
-        console.log(index)
+        // console.log(index)
     }
 
     // work in progress
@@ -38,20 +39,28 @@ connectGUI = (function () {
         //console.log(btn.getAttribute("data-id"));
         // 1. check if button that was pressed is empty
         let empty = game.checkForEmptyButton(btn);
-        console.log(`empty button: ${empty}`);
+        // console.log(`empty button: ${empty}`);
         // if button was not empty, check if there is at least on button empty on the gameboard
         if (empty === false) {
             return
         };
+
+        // LOGIC NEEDS TO SPLIT UP IN DIFFERENT METHODS
         // 2. if button was empty get Player Sign and Insert it into Button
         game.setTurn(btn);
         console.log(game.outputBoard());
         // 3. Check for winning condition
-
+        let winnerFound = game.checkForWinner();
+        if(winnerFound === true) {
+            game.getWinner();
+        }
         // 4. check for empty spot on board
         //    if no empty spot..game over and no winner
-        //console.log(game. checkForEmptySpot());
-
+        
+        let spaceOnBoard = game.checkForEmptySpot();
+        if (spaceOnBoard === false) {
+            console.log("No space available on Board. GameOver! work in progress...");
+        }      
     }
 
     return { renderBoard, setPlayerSign };
@@ -59,15 +68,6 @@ connectGUI = (function () {
 
 // Game factory function (for the flow of the game)
 const game = (function () {
-
-    // i don't need that in UI
-    const shufflePlayerStartPosition = (arr) => {
-        let shuffledArray = arr
-            .map(value => ({ value, sort: Math.random() }))
-            .sort((a, b) => a.sort - b.sort)
-            .map(({ value }) => value);
-        return shuffledArray;
-    }
 
     // i don't need that in UI
     const getTurn = (player) => {
@@ -98,7 +98,7 @@ const game = (function () {
         // if all checks are false, return false (no winner was found)
 
         result = gameBoard.checkRows(player);
-        //console.log(`1) check rows              => result: ${result}`);
+        // console.log(`1) check rows              => result: ${result}`);
         if (result === true) return result;
 
         result = gameBoard.checkColumns(player);
@@ -129,8 +129,12 @@ const game = (function () {
         return result;
     }
 
+    const getWinner = () => {
+        console.log("We have a winner. Work under progress...");
+    }
 
-    return { shufflePlayerStartPosition, getTurn, setTurn, getBoard, outputBoard, checkForWinner, checkForEmptyButton ,checkForEmptySpot };
+
+    return { getTurn, setTurn, getWinner, getBoard, outputBoard, checkForWinner, checkForEmptyButton ,checkForEmptySpot };
 })();
 
 // Gameboard factory function
@@ -164,21 +168,10 @@ const gameBoard = (function () {
             lastSignSet = player1.getSign();
             board[index_1][index_2] = player1.getSign();
         }
-        // 2. set player input in array
-        /*
-        let turn = player.setTurn();
-        let arrTurn = turn.split(" ");
-        let firstTurn = arrTurn[0];
-        let secondTurn = arrTurn[1];
-        for (let i = 0; i < board.length; i++) {
-            for (let j = 0; j < board[i].length; j++) {
-                if (i == firstTurn && j == secondTurn) {
-                    board[i][j] = player.getSign();
-                    return;
-                }
-            }
-        }
-        */
+    }
+
+    const getLastSignSet = () => {
+        return lastSignSet;
     }
 
     // get variable board
@@ -203,7 +196,9 @@ const gameBoard = (function () {
     };
 
     const checkRows = (player) => {
-        let playerSign = player.getSign();
+        //let playerSign = player.getSign();
+        let playerSign = getLastSignSet();
+        // console.log(`playerSign: ${playerSign}`)
         let previousIteration;
         let currentIteration;
         let winner = true;
@@ -236,7 +231,8 @@ const gameBoard = (function () {
     }
 
     const checkColumns = (player) => {
-        let playerSign = player.getSign();
+        let playerSign = getLastSignSet();
+        // console.log(`playerSign: ${playerSign}`)
         let previousIteration;
         let currentIteration;
         let winner = true;
@@ -274,7 +270,8 @@ const gameBoard = (function () {
         // 0 0
         // 1 1
         // 2 2
-        let playerSign = player.getSign();
+        let playerSign = getLastSignSet();
+        // console.log(`playerSign: ${playerSign}`)
         let previousIteration;
         let currentIteration;
         let winner = true;
@@ -302,7 +299,8 @@ const gameBoard = (function () {
         // 0 2
         // 1 1
         // 2 0
-        let playerSign = player.getSign();
+        let playerSign = getLastSignSet();
+        // console.log(`playerSign: ${playerSign}`)
         let previousIteration;
         let currentIteration;
         let winner = true;
@@ -344,7 +342,7 @@ const gameBoard = (function () {
         return emptySpace;
     }
 
-    return { setBoard, getBoard, outputBoard, checkRows, checkColumns, checkCrossLeftToRight, checkCrossRightToLeft, checkForEmptySpot };
+    return { setBoard, getBoard, outputBoard, checkRows, checkColumns, checkCrossLeftToRight, checkCrossRightToLeft, checkForEmptySpot, getLastSignSet };
 })();
 
 
@@ -352,41 +350,11 @@ const gameBoard = (function () {
 const player = function (playerSign) {
     let name;
     const sign = playerSign;
-    let input;
 
     const getName = () => name;
     const getSign = () => sign;
 
-    const getTurn = () => {
-        let board = gameBoard.getBoard();
-        let correctInput = false;
-        do {
-
-            input = prompt("Enter your turn (pos1 pos2)");
-            let arrTurn = input.split(" ");
-            let firstTurn = arrTurn[0];
-            let secondTurn = arrTurn[1];
-
-            // check if user input is bigger than max length of array and array in array
-            if (firstTurn > board.length - 1 || secondTurn > board[0].length - 1) {
-                continue;
-            }
-            // check if user input is smaller than 0 index
-            if (firstTurn < 0 || secondTurn < 0) {
-                continue;
-            }
-            // check if position is empty
-            if (board[firstTurn][secondTurn] == "") {
-                correctInput = true;
-            }
-        } while (!correctInput);
-    }
-
-    const setTurn = () => {
-        return input;
-    }
-
-    return { getName, getSign, setTurn, getTurn };
+    return { getName, getSign };
 }
 
 
@@ -394,23 +362,11 @@ const player = function (playerSign) {
 connectGUI.renderBoard();
 const player1 = player("X");
 const player2 = player("O");
-console.log(player1.getSign());
-console.log(player2.getSign());
+// console.log(player1.getSign());
+// console.log(player2.getSign());
 
 
 /*
-// get player names
-const userName1 = "Sebastian";
-const userName2 = "Peter";
-
-// put both names in array to randomly generate starting position
-let tempArr = [userName1, userName2];
-let shuffledArray = game.shufflePlayerStartPosition(tempArr);
-
-// create two player object
-let player1 = player(shuffledArray[0], "X");
-let player2 = player(shuffledArray[1], "O");
-
 let winnerFound = false;
 console.log("TIC TAC TOE");
 console.log(game.outputBoard());
