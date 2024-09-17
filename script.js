@@ -2,40 +2,40 @@
 // everything clickable should be a button, for accessibility reasons
 // using factory functions
 
-// Object for displaying the game on the page
-// - function that will render the content of the gameboard array to the webpage
+// get html element for text displayed during the game
+const gameInfoText = document.querySelector("#item-game-info-text");
+gameInfoText.innerHTML = "Player 1 it's your turn!";
+
 const buttons = document.querySelectorAll("#btn");
 buttons.forEach((btn) => {
     btn.addEventListener("click", (event) => {
         // console.log("button clicked");
         const btn = event.target;
         //console.log(btn.getAttribute("data-id"));
-        connectGUI.setPlayerSign(btn);
+        connectGUI.playGame(btn);
     })
 })
 
+// Object for displaying the game on the page
 connectGUI = (function () {
 
     const renderBoard = () => {
         const board = game.getBoard();
         let index = 0;
         for (let i = 0; i < board.length; i++) {
-            
+
             for (let j = 0; j < board[i].length; j++) {
-                
-                if(board[i][j] != "") {
-                    // console.log(board[i][j]);
+
+                if (board[i][j] != "") {
                     buttons[index].innerHTML = board[i][j];
                 }
                 index++;
-                
             }
         }
-        // console.log(index)
     }
 
     // work in progress
-    const setPlayerSign = (btn) =>  {
+    const playGame = (btn) => {
         //console.log(btn.getAttribute("data-id"));
         // 1. check if button that was pressed is empty
         let empty = game.checkForEmptyButton(btn);
@@ -44,34 +44,61 @@ connectGUI = (function () {
         if (empty === false) {
             return
         };
-
-        // LOGIC NEEDS TO SPLIT UP IN DIFFERENT METHODS
         // 2. if button was empty get Player Sign and Insert it into Button
         game.setTurn(btn);
         console.log(game.outputBoard());
         // 3. Check for winning condition
         let winnerFound = game.checkForWinner();
-        if(winnerFound === true) {
-            game.getWinner();
-        }
-        // 4. check for empty spot on board
+        console.log(`winnerFound: ${winnerFound}`);
+        if (winnerFound == true) {
+            gameInfoText.innerHTML = game.getWinner();
+            buttons.forEach((btn) => {
+                btn.disabled = true;
+            })
+            return;  
+        } 
+        // 5. check for empty spot on board
         //    if no empty spot..game over and no winner
-        
         let spaceOnBoard = game.checkForEmptySpot();
         if (spaceOnBoard === false) {
-            console.log("No space available on Board. GameOver! work in progress...");
-        }      
+            gameInfoText.innerHTML = game.getNoWinner();
+            buttons.forEach((btn) => {
+                btn.disabled = true;
+            })
+            return;
+        }
+        // 6. render game info text
+        gameInfoText.innerHTML = game.renderTextNextTurn();
     }
 
-    return { renderBoard, setPlayerSign };
+    return { renderBoard, playGame };
 })();
 
 // Game factory function (for the flow of the game)
 const game = (function () {
-
-    // i don't need that in UI
-    const getTurn = (player) => {
-        player.getTurn();
+    const renderTextNextTurn = () => {
+        let lastTurn = gameBoard.getLastSignSet();
+        let textOutput;
+        console.log(`last turn: ${lastTurn}`)
+        switch (lastTurn) {
+            case "":
+                console.log("a")
+                textOutput = "Player 1 ";
+                break;
+            case "X":
+                console.log("b")
+                textOutput = "Player  2 ";
+                break;
+            case "O":
+                console.log("c")
+                textOutput = "Player 1 ";
+                break;
+            default:
+                console.log("something went wrong, you shouldn't see me!");
+                break;
+        }
+        textOutput += "it's your turn!";
+        return textOutput;
     }
 
     // set player sign
@@ -130,11 +157,33 @@ const game = (function () {
     }
 
     const getWinner = () => {
-        console.log("We have a winner. Work under progress...");
+
+        let winnerSign;
+        let winnerText = "Congratulation! ";
+        winnerSign = gameBoard.getLastSignSet();
+        switch (winnerSign) {
+            case "X":
+                winnerText += "Player 1 "
+                break;
+            case "O":
+                winnerText += "Player 2 "
+                break;
+            default:
+                console.log("Something went wrong, you shouldn't see me!");
+                break;
+        }
+        winnerText += "has won the game!"
+        // console.log(textWinner + " has won the game!");
+        return winnerText;
+
+    }
+
+    const getNoWinner = () => {
+        return "Board is full. Game Over!";
     }
 
 
-    return { getTurn, setTurn, getWinner, getBoard, outputBoard, checkForWinner, checkForEmptyButton ,checkForEmptySpot };
+    return { setTurn, getWinner, getNoWinner, getBoard, outputBoard, renderTextNextTurn, checkForWinner, checkForEmptyButton, checkForEmptySpot };
 })();
 
 // Gameboard factory function
