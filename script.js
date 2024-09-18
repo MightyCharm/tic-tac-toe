@@ -1,7 +1,10 @@
 // get buttons for confirm player name and restart
 const player1Button = document.querySelector("#player1-button");
+const player1Input = document.querySelector("#player1-input");
 const player2Button = document.querySelector("#player2-button");
+const player2Input = document.querySelector("#player2-input");
 const restartButton = document.querySelector("#restart-button");
+
 // get textbox in GUI
 const gameInfoText = document.querySelector("#item-game-info-text");
 gameInfoText.innerHTML = "Player 1 it's your turn!";
@@ -18,11 +21,19 @@ buttons.forEach((btn) => {
 })
 
 player1Button.addEventListener("click", () => {
-    console.log("set name for player1");
+    // 1. set name in player object
+    player1.setName(player1Input.value);
+    // 2. render name inside gameInfoText
+    gameInfoText.innerHTML = game.renderTextNextTurn();
 })
 
 player2Button.addEventListener("click", () => {
-    console.log("set name for player2");
+    // 1. set name in player object
+    player2.setName(player2Input.value);
+    console.log(player2.getName())
+    // 2. render name inside gameInfoText
+    gameInfoText.innerHTML = game.renderTextNextTurn();
+    
 })
 
 restartButton.addEventListener("click", () => {
@@ -70,24 +81,36 @@ connectGUI = (function () {
 // Game factory function (for the flow of the game)
 const game = (function () {
     const renderTextNextTurn = () => {
+        console.log("renderText")
+        let player1Name;
+        let player2name;
         let lastTurn = gameBoard.getLastSignSet();
         let textOutput;
-        // console.log(`last turn: ${lastTurn}`)
+        // check if player has entered a name
+        player1Name = player1.getName() + " ";
+        if (player1Name === "") {
+            player1Name = "Player1 ";
+        }
+        player2Name = player2.getName() + " ";
+        if (player2Name === "") {
+            player2Name = "Player2 ";
+        } 
         switch (lastTurn) {
             case "":
-                textOutput = "Player 1 ";
+                textOutput = player1Name;
                 break;
             case "X":
-                textOutput = "Player  2 ";
+                textOutput = player2Name;
                 break;
             case "O":
-                textOutput = "Player 1 ";
+                textOutput = player1Name;
                 break;
             default:
                 console.log("something went wrong, you shouldn't see me!");
                 break;
         }
         textOutput += "it's your turn!";
+        console.log(textOutput);
         return textOutput;
     }
 
@@ -95,6 +118,8 @@ const game = (function () {
     const setTurn = (btn) => {
         gameBoard.setBoardButtons(btn);
     }
+
+
 
     // get variable board
     const getBoardArray = () => {
@@ -425,13 +450,16 @@ const gameBoard = (function () {
 
 // Player factory function
 const player = function (playerSign) {
-    let name;
+    let name = "";
     const sign = playerSign;
 
+    const setName = (value) => {
+        name = value;
+    }
     const getName = () => name;
     const getSign = () => sign;
 
-    return { getName, getSign };
+    return { setName, getName, getSign };
 }
 
 // Create two player objects
