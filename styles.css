@@ -6,7 +6,7 @@
 
 body {
     background-color: grey;
-    
+
 }
 
 /* main container */
@@ -15,11 +15,8 @@ body {
     height: 100vh;
 
     display: grid;
-    grid-template-rows: 0.5fr 1fr 1fr;
+    grid-template-rows: 0.5fr 1fr 0.3fr 1fr;
     grid-template-columns: 1fr 1fr 1fr;
-    /* border: 5px solid red; */
-
-    
 }
 
 /* written text: tic tac toe */
@@ -32,8 +29,10 @@ body {
     color: white;
 }
 
-/* player1 section */
-.item-player1 {
+
+/* player1 and player 2 section */
+.item-player1,
+.item-player2 {
     height: 50%;
     width: 90%;
     grid-row-start: 2;
@@ -45,11 +44,12 @@ body {
 
     background-color: white;
     padding: 2rem;
-    /* border: 5px solid red; */
+    border-radius: 2px;
 }
 
-.player1-text-section {
-    
+.player1-text-section,
+.player2-text-section {
+
     grid-row-start: 2;
     align-self: center;
 
@@ -58,34 +58,44 @@ body {
     font-size: 2rem;
 }
 
-.player1-text {
+.player1-text,
+.player2-text {}
 
-}
+.player1-sign,
+.player2-sign {}
 
-.player1-sign {
-
-}
-
-.player1-input-section {
+.player1-input-section,
+.player2-input-section {
     grid-row-start: 3;
 
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 0.5fr 1fr 0.5fr;
 
     font-size: 2rem;
 }
 
-.player1-label-name {
+.player1-label-name,
+.player2-label-name {
     align-self: center;
 }
 
-.player1-input {
+.player1-input,
+.player2-input {
     font-size: 2rem;
     height: 50%;
-    width: 80%;
+    width: 100%;
 
     align-self: center;
     padding: 1rem;
+}
+
+.player1-button,
+.player2-button {
+    align-self: center;
+    justify-self: center;
+    width: 50%;
+    height: 51%;
+    font-size: 1.2rem;
 }
 
 /* gameboard section */
@@ -102,87 +112,40 @@ body {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     grid-template-rows: 1fr 1fr 1fr;
-    
+
     width: 100%;
     height: 100%;
-    /* width: 600px;
-    height: 600px; */
 }
 
 /* buttons */
 .btn {
-   background-color: white;
-   font-size: 4rem;
-
-   /* width: 200px;
-   height: 200px; */
-}
-
-/* player2 section */
-.item-player2 {
-    height: 50%;
-    width: 90%;
-    align-self: center;
-    justify-self: center;
-
-    grid-row-start: 2;
-    grid-column-start: 3;
-
-    display: grid;
-    grid-template-rows: 1fr 1fr 1fr 1fr;
-
     background-color: white;
-    padding: 2rem;
+    font-size: 4rem;
 }
 
-.player2-text-section {
-    grid-row-start: 2;
-    align-self: center;
-
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    font-size: 2rem;
-}
-
-.player2-text {
-}
-
-.player2-sign {
-
-}
-
-.player2-input-section {
+.item-game-restart {
     grid-row-start: 3;
-
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-
-    font-size: 2rem;
+    grid-column-start: 2;
+    justify-self: center;
+    align-self: center;
+    width: 40%;
+    height: 70%;
 }
 
-.player2-label-name { 
-    align-self: center;
-}
-
-.player2-input {
-    font-size: 2rem;
-    height: 50%;
-    width: 80%;
-
-    align-self: center;
-    padding: 1rem;
+.restart-button {
+    width: 100%;
+    height: 100%;
+    font-size: 1.2rem;
 }
 
 .item-game-info {
-    /* width: 600px;
-    height: 200px; */
     height: 50%;
     width: 100%;
 
     justify-self: center;
-    align-self: center;
+    align-self: start;
 
-    grid-row-start: 3;
+    grid-row-start: 4;
     grid-column-start: 2;
 
     display: grid;
@@ -191,12 +154,24 @@ body {
 
     font-size: 2rem;
     background-color: white;
+    border-radius: 2px;
 }
 
-.item-game-info-text {
+.item-game-info-text {}
 
+.item-reference {
+    grid-row-start: 4;
+    grid-column-start: 3;
+    align-self: center;
+    justify-self: end;
+    padding-right: 2rem;
+    /* color: rgb(71, 71, 91); */
 }
 
 .btn:hover {
     background-color: rgb(214, 211, 213);
+}
+
+a {
+    /* text-decoration: none; */
 }

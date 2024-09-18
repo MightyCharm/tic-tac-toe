@@ -1,11 +1,12 @@
-
-// everything clickable should be a button, for accessibility reasons
-// using factory functions
-
-// get html element for text displayed during the game
+// get buttons for confirm player name and restart
+const player1Button = document.querySelector("#player1-button");
+const player2Button = document.querySelector("#player2-button");
+const restartButton = document.querySelector("#restart-button");
+// get textbox in GUI
 const gameInfoText = document.querySelector("#item-game-info-text");
 gameInfoText.innerHTML = "Player 1 it's your turn!";
 
+// get all buttons that represent the gameboard
 const buttons = document.querySelectorAll("#btn");
 buttons.forEach((btn) => {
     btn.addEventListener("click", (event) => {
@@ -16,25 +17,22 @@ buttons.forEach((btn) => {
     })
 })
 
+player1Button.addEventListener("click", () => {
+    console.log("set name for player1");
+})
+
+player2Button.addEventListener("click", () => {
+    console.log("set name for player2");
+})
+
+restartButton.addEventListener("click", () => {
+    game.restart();
+})
+
 // Object for displaying the game on the page
 connectGUI = (function () {
 
-    const renderBoard = () => {
-        const board = game.getBoard();
-        let index = 0;
-        for (let i = 0; i < board.length; i++) {
-
-            for (let j = 0; j < board[i].length; j++) {
-
-                if (board[i][j] != "") {
-                    buttons[index].innerHTML = board[i][j];
-                }
-                index++;
-            }
-        }
-    }
-
-    // work in progress
+    //  main loop of the game, do something if button was pressed
     const playGame = (btn) => {
         //console.log(btn.getAttribute("data-id"));
         // 1. check if button that was pressed is empty
@@ -46,32 +44,27 @@ connectGUI = (function () {
         };
         // 2. if button was empty get Player Sign and Insert it into Button
         game.setTurn(btn);
-        console.log(game.outputBoard());
         // 3. Check for winning condition
         let winnerFound = game.checkForWinner();
-        console.log(`winnerFound: ${winnerFound}`);
+        // console.log(`winnerFound: ${winnerFound}`);
         if (winnerFound == true) {
             gameInfoText.innerHTML = game.getWinner();
-            buttons.forEach((btn) => {
-                btn.disabled = true;
-            })
-            return;  
-        } 
+            game.disableButtons();
+
+            return;
+        }
         // 5. check for empty spot on board
         //    if no empty spot..game over and no winner
         let spaceOnBoard = game.checkForEmptySpot();
         if (spaceOnBoard === false) {
             gameInfoText.innerHTML = game.getNoWinner();
-            buttons.forEach((btn) => {
-                btn.disabled = true;
-            })
+            game.disableButtons();
             return;
         }
         // 6. render game info text
         gameInfoText.innerHTML = game.renderTextNextTurn();
     }
-
-    return { renderBoard, playGame };
+    return { playGame };
 })();
 
 // Game factory function (for the flow of the game)
@@ -79,18 +72,15 @@ const game = (function () {
     const renderTextNextTurn = () => {
         let lastTurn = gameBoard.getLastSignSet();
         let textOutput;
-        console.log(`last turn: ${lastTurn}`)
+        // console.log(`last turn: ${lastTurn}`)
         switch (lastTurn) {
             case "":
-                console.log("a")
                 textOutput = "Player 1 ";
                 break;
             case "X":
-                console.log("b")
                 textOutput = "Player  2 ";
                 break;
             case "O":
-                console.log("c")
                 textOutput = "Player 1 ";
                 break;
             default:
@@ -103,19 +93,19 @@ const game = (function () {
 
     // set player sign
     const setTurn = (btn) => {
-        gameBoard.setBoard(btn);
+        gameBoard.setBoardButtons(btn);
     }
 
     // get variable board
-    const getBoard = () => {
+    const getBoardArray = () => {
         //console.log(gameBoard.getBoard());
-        return gameBoard.getBoard();
+        return gameBoard.getBoardArray();
     }
 
     // i don't need that in UI
     // get output for terminal
-    const outputBoard = () => {
-        return gameBoard.outputBoard();
+    const outputBoardArray = () => {
+        return gameBoard.outputBoardArray();
     }
 
     const checkForWinner = (player) => {
@@ -182,8 +172,34 @@ const game = (function () {
         return "Board is full. Game Over!";
     }
 
+    const restart = () => {
+        // clear board array
+        gameBoard.clearBoardArray();
+        // clear lastSignSet
+        gameBoard.clearLastSignSet();
+        // clear text inside buttons to display empty board
+        buttons.forEach((btn) => {
+            btn.innerHTML = "";
+        })
+        // reset text
+        gameInfoText.innerHTML = renderTextNextTurn();
+        // enable buttons (if game over)
+        enableButtons();
+    }
 
-    return { setTurn, getWinner, getNoWinner, getBoard, outputBoard, renderTextNextTurn, checkForWinner, checkForEmptyButton, checkForEmptySpot };
+    const enableButtons = () => {
+        buttons.forEach((btn) => {
+            btn.disabled = false;
+        })
+    }
+
+    const disableButtons = () => {
+        buttons.forEach((btn) => {
+            btn.disabled = true;
+        })
+    }
+
+    return { setTurn, getWinner, getNoWinner, getBoardArray, outputBoardArray, renderTextNextTurn, checkForWinner, checkForEmptyButton, checkForEmptySpot, restart, enableButtons, disableButtons };
 })();
 
 // Gameboard factory function
@@ -196,7 +212,7 @@ const gameBoard = (function () {
             ["", "", ""]
         ];
 
-    const setBoard = (btn) => {
+    const setBoardButtons = (btn) => {
         // 1. set player input in GUI
         // 2. set player input in board array
         let data_id = btn.getAttribute("data-id").split(" "); // get data-id from button(=equal to index in board array)
@@ -219,17 +235,30 @@ const gameBoard = (function () {
         }
     }
 
+    const clearBoardArray = () => {
+        board =
+            [
+                ["", "", ""],
+                ["", "", ""],
+                ["", "", ""]
+            ];
+    }
+
     const getLastSignSet = () => {
         return lastSignSet;
     }
 
+    const clearLastSignSet = () => {
+        lastSignSet = "";
+    }
+
     // get variable board
-    const getBoard = () => {
+    const getBoardArray = () => {
         return board;
     }
 
     // get output for terminal
-    const outputBoard = () => {
+    const outputBoardArray = () => {
         let formattedBoard = "";
         for (let i = 0; i < board.length; i++) {
             for (let j = 0; j < board[i].length; j++) {
@@ -391,9 +420,8 @@ const gameBoard = (function () {
         return emptySpace;
     }
 
-    return { setBoard, getBoard, outputBoard, checkRows, checkColumns, checkCrossLeftToRight, checkCrossRightToLeft, checkForEmptySpot, getLastSignSet };
+    return { setBoardButtons, getBoardArray, clearBoardArray, clearLastSignSet, outputBoardArray, checkRows, checkColumns, checkCrossLeftToRight, checkCrossRightToLeft, checkForEmptySpot, getLastSignSet };
 })();
-
 
 // Player factory function
 const player = function (playerSign) {
@@ -406,65 +434,7 @@ const player = function (playerSign) {
     return { getName, getSign };
 }
 
-
-// test render gameboard method
-connectGUI.renderBoard();
+// Create two player objects
+// connectGUI.renderBoard();
 const player1 = player("X");
 const player2 = player("O");
-// console.log(player1.getSign());
-// console.log(player2.getSign());
-
-
-/*
-let winnerFound = false;
-console.log("TIC TAC TOE");
-console.log(game.outputBoard());
-// main loop (I think I don't need that in GUI)
-while (winnerFound === false) {
-    // FIRST PLAYER
-    // 1. check if board has at least on empty spot left
-    if (game.checkForEmptySpot() === false) {
-        console.log("Board is full. No Winner! Game Over");
-        break;
-    }
-    // 2. player1 enters turn and turn is set into board array
-    game.getTurn(player1);
-    game.setTurn(player1);
-    // 3. clear console and output board 
-    console.clear();
-    console.log(game.outputBoard());
-    // 4. check for winner
-    winnerFound = game.checkForWinner(player1);
-    if (winnerFound === true) {
-        //game.gameOver(player1);
-        console.log(`Player1 won! winnerFound: ${winnerFound}. GameOver!`);
-        break;
-    } else {
-        console.log(`No winner! continue!`);
-    }
-
-    // SECOND PLAYER
-    // 1. check if board has at least on empty spot left
-    if (game.checkForEmptySpot() === false) {
-        console.log("Board is full. No Winner! Game Over");
-        break;
-    }
-    // 2. player2 enters turn and turn is set into board array
-    game.getTurn(player2);
-    game.setTurn(player2);
-
-    // 3. clear console and output board 
-    console.clear();
-    console.log(game.outputBoard());
-
-    // 4. check for winner
-    winnerFound = game.checkForWinner(player2);
-    if (winnerFound === true) {
-        //game.gameOver(player1);
-        console.log(`Player2 won! winnerFound: ${winnerFound}. GameOver!`);
-        break;
-    } else {
-        console.log(`No winner! continue!`);
-    }
-}
-    */
