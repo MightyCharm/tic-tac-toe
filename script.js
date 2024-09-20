@@ -1,12 +1,21 @@
-// get buttons for confirm player name and restart
-const player1Button = document.querySelector("#player1-button");
+// get input elements for names
 const player1Input = document.querySelector("#player1-input");
-const player2Button = document.querySelector("#player2-button");
 const player2Input = document.querySelector("#player2-input");
+// get button elements to confirm player name and restart
+const player1Button = document.querySelector("#player1-button");
+const player2Button = document.querySelector("#player2-button");
 const restartButton = document.querySelector("#restart-button");
+// get elements for the statistic, win, draws and lost
+const player1Wins = document.querySelector("#player1-wins-value");
+const player1Draws = document.querySelector("#player1-draws-value");
+const player1Lost = document.querySelector("#player1-lost-value");
+const player2Wins = document.querySelector("#player2-wins-value");
+const player2Draws = document.querySelector("#player2-draws-value");
+const player2Lost = document.querySelector("#player2-lost-value");
+
 
 // get textbox in GUI
-const gameInfoText = document.querySelector("#item-game-info-text");
+const gameInfoText = document.querySelector("#box-game-info-text");
 gameInfoText.innerHTML = "Player 1 it's your turn!";
 
 // get all buttons that represent the gameboard
@@ -21,17 +30,20 @@ buttons.forEach((btn) => {
 })
 
 player1Button.addEventListener("click", () => {
-    // 1. set name in player object
+    // Only change the name if user has actual entered something new into input field
+    if (player1Input.value === player1.getName()) return;
+    // set name in player object to input value
     player1.setName(player1Input.value);
-    // 2. render name inside gameInfoText
+    // render name inside gameInfoText
     gameInfoText.innerHTML = game.renderTextNextTurn();
 })
 
 player2Button.addEventListener("click", () => {
-    // 1. set name in player object
+    // Only change the name if user has actual entered something new into input field
+    if (player2Input.value === player2.getName()) return;
+    // set name in player object to input value
     player2.setName(player2Input.value);
-    console.log(player2.getName())
-    // 2. render name inside gameInfoText
+    // render name inside gameInfoText
     gameInfoText.innerHTML = game.renderTextNextTurn();
     
 })
@@ -60,6 +72,7 @@ connectGUI = (function () {
         // console.log(`winnerFound: ${winnerFound}`);
         if (winnerFound == true) {
             gameInfoText.innerHTML = game.getWinner();
+            game.renderStatistics();
             game.disableButtons();
 
             return;
@@ -69,6 +82,7 @@ connectGUI = (function () {
         let spaceOnBoard = game.checkForEmptySpot();
         if (spaceOnBoard === false) {
             gameInfoText.innerHTML = game.getNoWinner();
+            game.renderStatistics();
             game.disableButtons();
             return;
         }
@@ -80,20 +94,34 @@ connectGUI = (function () {
 
 // Game factory function (for the flow of the game)
 const game = (function () {
+   
+    const renderStatistics = () => {
+        player1Wins.innerHTML = player1.getWins();
+        player1Draws.innerHTML = player1.getDraws();
+        player1Lost.innerHTML = player1.getLost();
+        player2Wins.innerHTML = player2.getWins();
+        player2Draws.innerHTML = player2.getDraws();
+        player2Lost.innerHTML = player2.getLost();
+    }
+    // get output for terminal
+    const outputBoardArray = () => {
+        return gameBoard.outputBoardArray();
+    }
+
     const renderTextNextTurn = () => {
         console.log("renderText")
         let player1Name;
-        let player2name;
+        let player2Name;
         let lastTurn = gameBoard.getLastSignSet();
         let textOutput;
         // check if player has entered a name
-        player1Name = player1.getName() + " ";
+        player1Name = player1.getName();
         if (player1Name === "") {
-            player1Name = "Player1 ";
+            player1Name = "Player 1";
         }
-        player2Name = player2.getName() + " ";
+        player2Name = player2.getName();
         if (player2Name === "") {
-            player2Name = "Player2 ";
+            player2Name = "Player 2";
         } 
         switch (lastTurn) {
             case "":
@@ -109,7 +137,7 @@ const game = (function () {
                 console.log("something went wrong, you shouldn't see me!");
                 break;
         }
-        textOutput += "it's your turn!";
+        textOutput += " it's your turn!";
         console.log(textOutput);
         return textOutput;
     }
@@ -119,18 +147,10 @@ const game = (function () {
         gameBoard.setBoardButtons(btn);
     }
 
-
-
     // get variable board
     const getBoardArray = () => {
         //console.log(gameBoard.getBoard());
         return gameBoard.getBoardArray();
-    }
-
-    // i don't need that in UI
-    // get output for terminal
-    const outputBoardArray = () => {
-        return gameBoard.outputBoardArray();
     }
 
     const checkForWinner = (player) => {
@@ -173,27 +193,46 @@ const game = (function () {
 
     const getWinner = () => {
 
-        let winnerSign;
-        let winnerText = "Congratulation! ";
-        winnerSign = gameBoard.getLastSignSet();
-        switch (winnerSign) {
+        let signWinner;
+        let nameWinner
+        let textWinner = "Congratulation! ";
+        signWinner = gameBoard.getLastSignSet();
+        switch (signWinner) {
             case "X":
-                winnerText += "Player 1 "
+                nameWinner = player1.getName();
+                player1.setWins();
+                player2.setLost();
+                if (nameWinner === "") {
+                    textWinner += "Player 1";
+                }
+                else {
+                    textWinner += nameWinner;
+                }
+                
                 break;
             case "O":
-                winnerText += "Player 2 "
+                nameWinner = player2.getName();
+                player1.setLost();
+                player2.setWins();
+                if (nameWinner === "") {
+                    textWinner += "Player 2";
+                }
+                else {
+                    textWinner += nameWinner;
+                }
                 break;
             default:
                 console.log("Something went wrong, you shouldn't see me!");
                 break;
         }
-        winnerText += "has won the game!"
-        // console.log(textWinner + " has won the game!");
-        return winnerText;
+        textWinner += " has won the game!"
+        return textWinner;
 
     }
 
     const getNoWinner = () => {
+        player1.setDraws();
+        player2.setDraws();
         return "Board is full. Game Over!";
     }
 
@@ -213,18 +252,26 @@ const game = (function () {
     }
 
     const enableButtons = () => {
+        // enable all buttons that represent the board
         buttons.forEach((btn) => {
             btn.disabled = false;
         })
+        // enable buttons for selecting a new player name
+        player1Button.disabled = false;
+        player2Button.disabled = false;
     }
 
     const disableButtons = () => {
+        // disable all buttons that represent the board
         buttons.forEach((btn) => {
             btn.disabled = true;
         })
+        // disable buttons for selecting a new player name
+        player1Button.disabled = true;
+        player2Button.disabled = true;
     }
 
-    return { setTurn, getWinner, getNoWinner, getBoardArray, outputBoardArray, renderTextNextTurn, checkForWinner, checkForEmptyButton, checkForEmptySpot, restart, enableButtons, disableButtons };
+    return { renderStatistics, setTurn, getWinner, getNoWinner, getBoardArray, outputBoardArray, renderTextNextTurn, checkForWinner, checkForEmptyButton, checkForEmptySpot, restart, enableButtons, disableButtons };
 })();
 
 // Gameboard factory function
@@ -451,18 +498,38 @@ const gameBoard = (function () {
 // Player factory function
 const player = function (playerSign) {
     let name = "";
+    let wins = 0;
+    let draws = 0;
+    let lost = 0;
     const sign = playerSign;
 
     const setName = (value) => {
         name = value;
     }
+
+    const setWins = () => {
+        wins += 1;
+    }
+
+    const setDraws = () => {
+        draws += 1;
+    }
+
+    const setLost = () => {
+        lost += 1;
+    }
     const getName = () => name;
     const getSign = () => sign;
 
-    return { setName, getName, getSign };
+    const getWins = () => wins;
+    const getDraws = () => draws;
+    const getLost = () => lost;
+
+    return { setName, setWins, setDraws, setLost, getName, getSign, getWins, getDraws, getLost };
 }
 
 // Create two player objects
 // connectGUI.renderBoard();
 const player1 = player("X");
 const player2 = player("O");
+game.renderStatistics();

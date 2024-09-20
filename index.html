@@ -9,23 +9,33 @@
     <body>
         <div class="container">
 
-            <div class="item-header">
-                <h1>TIC TAC TOE</h1>
+            <div class="box-header">
+                <h1 class="header-text">TIC TAC TOE</h1>
             </div>
 
-            <div class="item-player1">
+            <div class=" box-player1">
                 <div class="player1-text-section">
                     <div class="player1-text">PLAYER 1</div>
                     <div class="player1-sign">X</div>
                 </div>
                 <div class="player1-input-section">
                     <div class="player1-label-name">Name</div>
-                    <input id="player1-input" class="player1-input" type="text">
+                    <input id="player1-input" class="player1-input" maxlength="10" type="text">
                     <button id="player1-button" class="player1-button">OK</button>
+                </div>
+
+                <div class="player1-statistic-section">   
+                    <div id="player1-wins-label" class="player1-wins-label">WINS</div>
+                    <div id="player1-wins-value" class="player1-wins-value"></div> 
+                    <div id="player1-draws-label" class="player1-draws-label">DRAWS</div>
+                    <div id="player1-draws-value" class="player1-draws-value"></div>
+                    <div id="player1-lost-label" class="player1-lost-label">LOST</div>
+                    <div id="player1-lost-value" class="player1-lost-value"></div>
+                    
                 </div>
             </div>
 
-            <div class="item-board">
+            <div class="box-board">
                 <div class="board">
                     <button id="btn" class="btn" data-id="0 0"></button>
                     <button id="btn" class="btn" data-id="0 1"></button>
@@ -39,25 +49,37 @@
                 </div>
             </div>
 
-            <div class="item-player2">
+            <div class="box-player2">
                 <div class="player2-text-section">
                     <div class="player2-text">PLAYER 2</div>
                     <div class="player2-sign">O</div>
                 </div>
                 <div class="player2-input-section">
                     <div class="player2-label-name">Name</div>
-                    <input id="player2-input" class="player2-input" type="text">
+                    <input id="player2-input" class="player2-input" maxlength="10" type="text">
                     <button id="player2-button" class="player2-button">OK</button>
                 </div>
-            </div>
-            <div class="item-game-restart">
-                <button id="restart-button" class="restart-button">Restart</button>
-            </div>
-            <div class="item-game-info">
-                <div id="item-game-info-text" class="item-game-info-text"></div>
+
+                <div class="player2-statistic-section">   
+                    <div id="player2-wins-label" class="player2-wins-label">WINS</div>
+                    <div id="player2-wins-value" class="player2-wins-value"></div> 
+                    <div id="player2-draws-label" class="player2-draws-label">DRAWS</div>
+                    <div id="player2-draws-value" class="player2-draws-value"></div>
+                    <div id="player2-lost-label" class="player2-lost-label">LOST</div>
+                    <div id="player2-lost-value" class="player2-lost-value"></div>
+                    
+                </div>
             </div>
 
-            <div class="item-reference">
+            <div class="box-game-restart">
+                <button id="restart-button" class="restart-button">Restart</button>
+            </div>
+
+            <div class="box-game-info">
+                <div id="box-game-info-text" class="item-game-info-text"></div>
+            </div>
+
+            <div class="box-reference">
                 <div><a href="https://github.com/MightyCharm">coded by MightyCharm</a></div>
             </div>
         </div>
