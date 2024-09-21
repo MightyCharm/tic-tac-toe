@@ -5,6 +5,7 @@ const player2Input = document.querySelector("#player2-input");
 const player1Button = document.querySelector("#player1-button");
 const player2Button = document.querySelector("#player2-button");
 const restartButton = document.querySelector("#restart-button");
+const newGameButton = document.querySelector("#new-game-button");
 // get elements for the statistic, win, draws and lost
 const player1Wins = document.querySelector("#player1-wins-value");
 const player1Draws = document.querySelector("#player1-draws-value");
@@ -34,6 +35,9 @@ player1Button.addEventListener("click", () => {
     if (player1Input.value === player1.getName()) return;
     // set name in player object to input value
     player1.setName(player1Input.value);
+    // disable OK button so that player can only enter 1 times during the game a name
+    player1Button.disabled = true;
+    player1Input.disabled = true;
     // render name inside gameInfoText
     gameInfoText.innerHTML = game.renderTextNextTurn();
 })
@@ -43,13 +47,20 @@ player2Button.addEventListener("click", () => {
     if (player2Input.value === player2.getName()) return;
     // set name in player object to input value
     player2.setName(player2Input.value);
+    // disable OK button so that player can only enter 1 times during the game a name
+    player2Button.disabled = true;
+    player2Input.disabled = true;
     // render name inside gameInfoText
     gameInfoText.innerHTML = game.renderTextNextTurn();
     
 })
 
 restartButton.addEventListener("click", () => {
-    game.restart();
+    game.restartGame();
+})
+
+newGameButton.addEventListener("click", () => {
+    game.newGame();
 })
 
 // Object for displaying the game on the page
@@ -236,7 +247,7 @@ const game = (function () {
         return "Board is full. Game Over!";
     }
 
-    const restart = () => {
+    const restartGame = () => {
         // clear board array
         gameBoard.clearBoardArray();
         // clear lastSignSet
@@ -251,14 +262,35 @@ const game = (function () {
         enableButtons();
     }
 
+    const newGame = () => {
+        // clear board array
+        gameBoard.clearBoardArray();
+        // clear lastSignSet
+        gameBoard.clearLastSignSet();
+        // clear text inside buttons to display empty board
+        buttons.forEach((btn) => {
+            btn.innerHTML = "";
+        })
+        // enable input and ok button for new game
+        player1Input.disabled = false;
+        player2Input.disabled = false;
+        player1Button.disabled = false;
+        player2Button.disabled = false;
+        // clear input field
+        player1Input.value = "";
+        player2Input.value = "";
+        // reset games statistics
+        player1.resetStatistic();
+        player2.resetStatistic();
+        // show update statistics
+        renderStatistics();
+    }
+
     const enableButtons = () => {
         // enable all buttons that represent the board
         buttons.forEach((btn) => {
             btn.disabled = false;
-        })
-        // enable buttons for selecting a new player name
-        player1Button.disabled = false;
-        player2Button.disabled = false;
+        })      
     }
 
     const disableButtons = () => {
@@ -266,12 +298,9 @@ const game = (function () {
         buttons.forEach((btn) => {
             btn.disabled = true;
         })
-        // disable buttons for selecting a new player name
-        player1Button.disabled = true;
-        player2Button.disabled = true;
     }
 
-    return { renderStatistics, setTurn, getWinner, getNoWinner, getBoardArray, outputBoardArray, renderTextNextTurn, checkForWinner, checkForEmptyButton, checkForEmptySpot, restart, enableButtons, disableButtons };
+    return { renderStatistics, setTurn, getWinner, getNoWinner, getBoardArray, outputBoardArray, renderTextNextTurn, checkForWinner, checkForEmptyButton, checkForEmptySpot, restartGame , newGame, enableButtons, disableButtons };
 })();
 
 // Gameboard factory function
@@ -504,7 +533,7 @@ const player = function (playerSign) {
     const sign = playerSign;
 
     const setName = (value) => {
-        name = value;
+        name = value;        
     }
 
     const setWins = () => {
@@ -518,6 +547,11 @@ const player = function (playerSign) {
     const setLost = () => {
         lost += 1;
     }
+    const resetStatistic = () => {
+        wins = 0;
+        draws = 0;
+        lost = 0;
+    }
     const getName = () => name;
     const getSign = () => sign;
 
@@ -525,7 +559,7 @@ const player = function (playerSign) {
     const getDraws = () => draws;
     const getLost = () => lost;
 
-    return { setName, setWins, setDraws, setLost, getName, getSign, getWins, getDraws, getLost };
+    return { setName, setWins, setDraws, setLost, resetStatistic, getName, getSign, getWins, getDraws, getLost };
 }
 
 // Create two player objects
