@@ -13,22 +13,12 @@ const player1Lost = document.querySelector("#player1-lost-value");
 const player2Wins = document.querySelector("#player2-wins-value");
 const player2Draws = document.querySelector("#player2-draws-value");
 const player2Lost = document.querySelector("#player2-lost-value");
-
-
 // get textbox in GUI
-const gameInfoText = document.querySelector("#box-game-info-text");
-gameInfoText.innerHTML = "Player 1 it's your turn!";
-
+const gameRenderText = document.querySelector("#box-game-info-text");
+gameRenderText.innerHTML = "Player 1 it's your turn";
 // get all buttons that represent the gameboard
 const buttons = document.querySelectorAll("#btn");
-buttons.forEach((btn) => {
-    btn.addEventListener("click", (event) => {
-        // console.log("button clicked");
-        const btn = event.target;
-        //console.log(btn.getAttribute("data-id"));
-        connectGUI.playGame(btn);
-    })
-})
+
 
 player1Button.addEventListener("click", () => {
     // Only change the name if user has actual entered something new into input field
@@ -38,8 +28,8 @@ player1Button.addEventListener("click", () => {
     // disable OK button so that player can only enter 1 times during the game a name
     player1Button.disabled = true;
     player1Input.disabled = true;
-    // render name inside gameInfoText
-    gameInfoText.innerHTML = game.renderTextNextTurn();
+    // if name was entered during the game, directly render it on the screen
+    game.renderText("player1Button");
 })
 
 player2Button.addEventListener("click", () => {
@@ -50,9 +40,8 @@ player2Button.addEventListener("click", () => {
     // disable OK button so that player can only enter 1 times during the game a name
     player2Button.disabled = true;
     player2Input.disabled = true;
-    // render name inside gameInfoText
-    gameInfoText.innerHTML = game.renderTextNextTurn();
-    
+    // if name was entered during the game, directly render it on the screen
+    game.renderText("player2Button");
 })
 
 restartButton.addEventListener("click", () => {
@@ -63,49 +52,262 @@ newGameButton.addEventListener("click", () => {
     game.newGame();
 })
 
+/* this button represent the game loop */
+buttons.forEach((btn) => {
+    btn.addEventListener("click", (event) => {
+        const btn = event.target;
+        connectGUI.playGame(btn);
+    })
+})
+
 // Object for displaying the game on the page
 connectGUI = (function () {
 
     //  main loop of the game, do something if button was pressed
     const playGame = (btn) => {
-        //console.log(btn.getAttribute("data-id"));
-        // 1. check if button that was pressed is empty
+        // check if button that was pressed is empty
         let empty = game.checkForEmptyButton(btn);
         // console.log(`empty button: ${empty}`);
         // if button was not empty, check if there is at least on button empty on the gameboard
         if (empty === false) {
             return
         };
-        // 2. if button was empty get Player Sign and Insert it into Button
+        // if button was empty get Player Sign and Insert it into Button
         game.setTurn(btn);
-        // 3. Check for winning condition
+        // Check if a player has won the game
         let winnerFound = game.checkForWinner();
-        // console.log(`winnerFound: ${winnerFound}`);
         if (winnerFound == true) {
-            gameInfoText.innerHTML = game.getWinner();
+            game.setStatus(false);
+            game.setWinner();
+            game.renderText("winner");
             game.renderStatistics();
-            game.disableButtons();
-
+            game.disableBoardButtons();
             return;
         }
-        // 5. check for empty spot on board
-        //    if no empty spot..game over and no winner
+        // check for empty spot on board
+        // check if it's a draw because the board is full
         let spaceOnBoard = game.checkForEmptySpot();
         if (spaceOnBoard === false) {
-            gameInfoText.innerHTML = game.getNoWinner();
+            game.setStatus(false);
+            game.setDraw();
+            game.renderText("boardFull");
             game.renderStatistics();
-            game.disableButtons();
+            game.disableBoardButtons();
             return;
         }
-        // 6. render game info text
-        gameInfoText.innerHTML = game.renderTextNextTurn();
+        // render game info text
+        game.renderText();
     }
     return { playGame };
 })();
 
 // Game factory function (for the flow of the game)
 const game = (function () {
-   
+
+    // status is used to show the correct text, especial if some player wants to enter name and
+    // the game is in that moment in the end screen and not running,
+    // true = game is running, false = winner was found or draw,
+    // changed from "connectGUI"(set to "false") and "newGame/restartGame"(set to "true")
+    let status = true;
+
+    const renderText = (optional = "") => {
+        
+
+        // I need one more condition for the case that the game is over,
+        // - winner or board full
+        // in that case name change should not be rendered
+        if (optional === "player1Button" || optional === "player2Button") {
+            console.log("player1 want to change name, render text...");
+            
+            // need to know which turn it is
+            let playerSign = gameBoard.getLastSignSet();
+            let player1Name = player1.getName();
+            let player2Name = player2.getName();
+            // check which turn it is to choose what to render
+            if(getStatus() === true) {
+                let textOutput = "";
+                if (playerSign === "O") { // Player 1 turn
+                    textOutput = `${player1Name} it's your turn`;
+                }
+                else if (playerSign === "X") { // Player 2 turn
+                    textOutput = `${player2Name} it's your turn`;
+                } // first turn of the game, Player 1 turn
+                else {
+                    if (player1Name === "") {
+                        textOutput = "Player 1 it's your turn 2";
+
+                    } else {
+                        textOutput = `${player1Name} it's your turn 1`;
+                    }
+                }
+                gameRenderText.innerHTML = textOutput;
+            }
+        }       
+        else if (optional === "winner") {
+            console.log("winner was found");
+            let textOutput = "";
+            // get player name who won the game
+            // insert player name into text string
+            let signWinner;
+            let nameWinner
+            textOutput = "Congratulation! ";
+            signWinner = gameBoard.getLastSignSet();
+            switch (signWinner) {
+                case "X":
+                    nameWinner = player1.getName();
+                    if (nameWinner === "") {
+                        textOutput += "Player 1";
+                    }
+                    else {
+                        textOutput += nameWinner;
+                    }
+                    break;
+                case "O":
+                    nameWinner = player2.getName();
+
+                    if (nameWinner === "") {
+                        textOutput += "Player 2";
+                    }
+                    else {
+                        textOutput += nameWinner;
+                    }
+                    break;
+                default:
+                    console.log("Something went wrong, you shouldn't see me!");
+                    break;
+            }
+            textOutput += " has won the game!"
+            gameRenderText.innerHTML = textOutput;
+
+        }
+        else if (optional === "boardFull") {
+            let textOutput = "";
+            console.log("no space on gameboard!");
+            // gameboard is full, insert DRAW into text string
+            textOutput = "Board is full. Draw!";
+            gameRenderText.innerHTML = textOutput;
+        }
+        else if (optional === "restart") {
+            let textOutput = "";
+            let name = player1.getName();
+            if (name === "") {
+                textOutput = "Player 1 it's your turn";
+            }
+            else {
+                textOutput = `${name} it's your turn`;
+            }
+            gameRenderText.innerHTML = textOutput;
+
+        }
+        else if (optional === "new-game") {
+            let textOutput = "";
+            textOutput = "Player 1 it's your turn";
+            gameRenderText.innerHTML = textOutput;
+        }
+        // normal call if game is running
+        else if (optional === "") {
+            // get player name
+            // insert player name into string
+            let textOutput = "";
+            let name = "";
+            let playerSign = gameBoard.getLastSignSet();
+            if (playerSign === "O") {
+                name = player1.getName();
+                if (name === "") {
+                    textOutput += "Player 1";
+                } else {
+                    textOutput += name;
+                }
+            }
+            else {
+                name = player2.getName();
+                if (name === "") {
+                    textOutput += "Player 2";
+                } else {
+                    textOutput += name;
+                }
+            }
+            textOutput += " it's your turn";
+            gameRenderText.innerHTML = textOutput;
+        }
+        
+
+        
+
+    }
+
+    const restartGame = () => {
+        gameBoard.clearBoardArray();
+        gameBoard.clearLastSignSet();
+        // clear text inside buttons to display empty board
+        gameBoard.clearSignsFromButtons();
+        game.setStatus(true);
+        // reset text
+        game.renderText("restart");
+        // enable buttons that represent the board
+        enableBoardButtons();
+    }
+
+    const newGame = () => {
+        // clear board array
+        gameBoard.clearBoardArray();
+        // clear lastSignSet
+        gameBoard.clearLastSignSet();
+        // clear text inside buttons to display empty board
+        gameBoard.clearSignsFromButtons();
+        // enable input and ok button for new game
+        player1Input.disabled = false;
+        player2Input.disabled = false;
+        player1Button.disabled = false;
+        player2Button.disabled = false;
+        // clear names
+        player1.setName("");
+        player2.setName("");
+        // clear input field
+        player1Input.value = "";
+        player2Input.value = "";
+        // reset games statistics
+        player1.resetStatistic();
+        player2.resetStatistic();
+        // show update statistics
+        renderStatistics();
+        enableBoardButtons();
+        game.setStatus(true);
+        game.renderText("new-game");
+
+    }
+
+    const setStatus = (gameStatus) => {
+        status = gameStatus;
+    }
+
+    const getStatus = () => {
+        return status;
+    }
+
+    const setWinner = () => {
+        signWinner = gameBoard.getLastSignSet();
+        switch (signWinner) {
+            case "X":
+                player1.setWins();
+                player2.setLost();
+                break;
+            case "O":
+                player1.setLost();
+                player2.setWins();
+                break;
+            default:
+                console.log("Something went wrong, you shouldn't see me!");
+                break;
+        }
+    }
+
+    const setDraw = () => {
+
+        player1.setDraws();
+        player2.setDraws();
+    }
+
     const renderStatistics = () => {
         player1Wins.innerHTML = player1.getWins();
         player1Draws.innerHTML = player1.getDraws();
@@ -117,40 +319,6 @@ const game = (function () {
     // get output for terminal
     const outputBoardArray = () => {
         return gameBoard.outputBoardArray();
-    }
-
-    const renderTextNextTurn = () => {
-        console.log("renderText")
-        let player1Name;
-        let player2Name;
-        let lastTurn = gameBoard.getLastSignSet();
-        let textOutput;
-        // check if player has entered a name
-        player1Name = player1.getName();
-        if (player1Name === "") {
-            player1Name = "Player 1";
-        }
-        player2Name = player2.getName();
-        if (player2Name === "") {
-            player2Name = "Player 2";
-        } 
-        switch (lastTurn) {
-            case "":
-                textOutput = player1Name;
-                break;
-            case "X":
-                textOutput = player2Name;
-                break;
-            case "O":
-                textOutput = player1Name;
-                break;
-            default:
-                console.log("something went wrong, you shouldn't see me!");
-                break;
-        }
-        textOutput += " it's your turn!";
-        console.log(textOutput);
-        return textOutput;
     }
 
     // set player sign
@@ -169,23 +337,17 @@ const game = (function () {
         let result;
         // if one check is true cancel rest return true (winner was found)
         // if all checks are false, return false (no winner was found)
-
         result = gameBoard.checkRows(player);
-        // console.log(`1) check rows              => result: ${result}`);
         if (result === true) return result;
 
         result = gameBoard.checkColumns(player);
-        // console.log(`2) check columns           => result: ${result}`);
         if (result === true) return result;
 
         result = gameBoard.checkCrossLeftToRight(player);
-        // console.log(`3) check cross left/right  => result: ${result}`);
         if (result === true) return result;
 
         result = gameBoard.checkCrossRightToLeft(player);
-        // console.log(`4) check cross right/left  => result: ${result}`);
         return result;
-
     }
 
     // check if button that was pressed is empty or not
@@ -202,105 +364,21 @@ const game = (function () {
         return result;
     }
 
-    const getWinner = () => {
-
-        let signWinner;
-        let nameWinner
-        let textWinner = "Congratulation! ";
-        signWinner = gameBoard.getLastSignSet();
-        switch (signWinner) {
-            case "X":
-                nameWinner = player1.getName();
-                player1.setWins();
-                player2.setLost();
-                if (nameWinner === "") {
-                    textWinner += "Player 1";
-                }
-                else {
-                    textWinner += nameWinner;
-                }
-                
-                break;
-            case "O":
-                nameWinner = player2.getName();
-                player1.setLost();
-                player2.setWins();
-                if (nameWinner === "") {
-                    textWinner += "Player 2";
-                }
-                else {
-                    textWinner += nameWinner;
-                }
-                break;
-            default:
-                console.log("Something went wrong, you shouldn't see me!");
-                break;
-        }
-        textWinner += " has won the game!"
-        return textWinner;
-
-    }
-
-    const getNoWinner = () => {
-        player1.setDraws();
-        player2.setDraws();
-        return "Board is full. Game Over!";
-    }
-
-    const restartGame = () => {
-        // clear board array
-        gameBoard.clearBoardArray();
-        // clear lastSignSet
-        gameBoard.clearLastSignSet();
-        // clear text inside buttons to display empty board
-        buttons.forEach((btn) => {
-            btn.innerHTML = "";
-        })
-        // reset text
-        gameInfoText.innerHTML = renderTextNextTurn();
-        // enable buttons (if game over)
-        enableButtons();
-    }
-
-    const newGame = () => {
-        // clear board array
-        gameBoard.clearBoardArray();
-        // clear lastSignSet
-        gameBoard.clearLastSignSet();
-        // clear text inside buttons to display empty board
-        buttons.forEach((btn) => {
-            btn.innerHTML = "";
-        })
-        // enable input and ok button for new game
-        player1Input.disabled = false;
-        player2Input.disabled = false;
-        player1Button.disabled = false;
-        player2Button.disabled = false;
-        // clear input field
-        player1Input.value = "";
-        player2Input.value = "";
-        // reset games statistics
-        player1.resetStatistic();
-        player2.resetStatistic();
-        // show update statistics
-        renderStatistics();
-    }
-
-    const enableButtons = () => {
+    const enableBoardButtons = () => {
         // enable all buttons that represent the board
         buttons.forEach((btn) => {
             btn.disabled = false;
-        })      
+        })
     }
 
-    const disableButtons = () => {
+    const disableBoardButtons = () => {
         // disable all buttons that represent the board
         buttons.forEach((btn) => {
             btn.disabled = true;
         })
     }
 
-    return { renderStatistics, setTurn, getWinner, getNoWinner, getBoardArray, outputBoardArray, renderTextNextTurn, checkForWinner, checkForEmptyButton, checkForEmptySpot, restartGame , newGame, enableButtons, disableButtons };
+    return { setStatus, getStatus, renderText, renderStatistics, setTurn, setWinner, setDraw, getBoardArray, outputBoardArray, checkForWinner, checkForEmptyButton, checkForEmptySpot, restartGame, newGame, enableBoardButtons, disableBoardButtons };
 })();
 
 // Gameboard factory function
@@ -313,6 +391,7 @@ const gameBoard = (function () {
             ["", "", ""]
         ];
 
+    // works with lastSignSet variables
     const setBoardButtons = (btn) => {
         // 1. set player input in GUI
         // 2. set player input in board array
@@ -521,7 +600,13 @@ const gameBoard = (function () {
         return emptySpace;
     }
 
-    return { setBoardButtons, getBoardArray, clearBoardArray, clearLastSignSet, outputBoardArray, checkRows, checkColumns, checkCrossLeftToRight, checkCrossRightToLeft, checkForEmptySpot, getLastSignSet };
+    const clearSignsFromButtons = () => {
+        buttons.forEach((btn) => {
+            btn.innerHTML = "";
+        })
+    }
+
+    return { setBoardButtons, getBoardArray, clearBoardArray, clearLastSignSet, outputBoardArray, checkRows, checkColumns, checkCrossLeftToRight, checkCrossRightToLeft, checkForEmptySpot, getLastSignSet, clearSignsFromButtons };
 })();
 
 // Player factory function
@@ -533,7 +618,7 @@ const player = function (playerSign) {
     const sign = playerSign;
 
     const setName = (value) => {
-        name = value;        
+        name = value;
     }
 
     const setWins = () => {
