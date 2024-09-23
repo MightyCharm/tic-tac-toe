@@ -5,8 +5,9 @@
 }
 
 :root {
-    --bg-color: rgb(139, 139, 139);
-    --bg-color-elements: rgb(11, 69, 102);
+    --bg-color: rgb(11, 69, 102);
+    --bg-color-elements: rgb(255, 255, 255); 
+    --color-elements: #000;
 }
 
 body {
@@ -49,19 +50,17 @@ body {
 
 .box-player1,
 .box-player2 {
-
     justify-self: center;
     align-self: center;
 
     display: grid;
 
-    background-color: var(--bg-color-elements);
     border-radius: 2px;
-    
     height: 80%;
     width: 90%;
     font-size: 2rem;
-    color: white;
+    background-color: var(--bg-color-elements);
+    color: var(--color-elements);
 }
 
 .box-player1-top-section,
@@ -88,7 +87,7 @@ body {
     grid-template-columns: 1fr 2fr 1fr;
     align-items: center;
 
-    border-top: 1px solid #fff;
+    border-top: 1px solid black;
 }
 
 .player1-label-name,
@@ -128,8 +127,6 @@ body {
     grid-template-columns: 1fr 1fr 1fr;
     justify-items: center;
     align-items: center;
-
-    border-top: 1px solid #fff; 
 }
 
 .player1-wins-label,
@@ -220,7 +217,6 @@ body {
     transition: transform 0.4s;
     
     font-size: 1.2rem;
-    font-weight: bold;
     background-color: #fff;
 
 }
@@ -249,10 +245,10 @@ body {
     width: 100%;
 
     font-size: 2rem;
-    background-color: var(--bg-color-elements);
-    color: white;
     border-radius: 2px;
     text-align: center;
+    color: var(--color-elements);
+    background-color: var(--bg-color-elements);
 }
 
 .box-game-info-text {

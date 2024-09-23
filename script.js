@@ -60,6 +60,21 @@ buttons.forEach((btn) => {
     })
 })
 
+// feature: show preview
+buttons.forEach((btn) => {
+    btn.addEventListener("mouseover", (event) => {
+        const btn = event.target;
+        connectGUI.showPreview(btn);
+    })
+})
+// feature: show preview 
+buttons.forEach((btn) => {
+    btn.addEventListener("mouseout", (event) => {
+        const btn = event.target;
+        connectGUI.removePreview(btn);
+    })
+})
+
 // Object for displaying the game on the page
 connectGUI = (function () {
 
@@ -67,7 +82,8 @@ connectGUI = (function () {
     const playGame = (btn) => {
         // check if button that was pressed is empty
         let empty = game.checkForEmptyButton(btn);
-        // console.log(`empty button: ${empty}`);
+
+        console.log(`empty button: ${empty}`);
         // if button was not empty, check if there is at least on button empty on the gameboard
         if (empty === false) {
             return
@@ -98,10 +114,78 @@ connectGUI = (function () {
         // render game info text
         game.renderText();
     }
-    return { playGame };
+
+    // work in progress
+    // both methods should go into game factory function
+    const showPreview = (btn) => {
+        // show preview only if the game is running
+        let status = game.getStatus();
+        if(status === false) return;
+        console.log(`status: ${status}`);
+        let opacity = 0.9;
+        // check if board array is empty at that space
+        let data_id = btn.getAttribute("data-id").split(" "); // get data-id from button(=equal to index in board array)
+        let index_1 = data_id[0];
+        let index_2 = data_id[1];
+        const board = gameBoard.getBoardArray();
+        //console.log(`in: index_1: ${index_1}  index_2: ${index_2}`);
+        // if empty show preview
+        if (board[index_1][index_2] === "") {
+            //console.log("show preview");
+            // get last sign to know which players turn is now
+            // set sign in inner html  
+            let lastSign = gameBoard.getLastSignSet();
+            // if lastSign is empty, preview "X" because it is the first turn in the game
+            // if lastSign is "X", preview "O"
+            // if lastSign is "O" preview "X" 
+            switch (lastSign) {     
+                case "":
+                    btn.innerHTML = "X";
+                    btn.style.opacity = opacity;
+                    break;
+                case "O":
+                    btn.innerHTML = "X";
+                    btn.style.opacity = opacity;
+                    break;
+                case "X":
+                    btn.innerHTML = "O";
+                    btn.style.opacity = opacity;
+                    break;
+                default:
+                    console.log("Shouldn't see me.");
+                    break;
+              
+            }
+            // if lastSign is "X", preview "O"
+            // if lastSign is "O" preview "X"    
+        }
+    }
+
+    const removePreview = (btn) => {
+        btn.style.opacity = 1;
+        // check if board array is empty at that space
+        // check if board array is empty at that space
+        let data_id = btn.getAttribute("data-id").split(" "); // get data-id from button(=equal to index in board array)
+        let index_1 = data_id[0];
+        let index_2 = data_id[1];
+        //console.log(`out: index_1: ${index_1}  index_2: ${index_2}`);
+        const board = gameBoard.getBoardArray();
+        //console.log(`index_1: ${index_1}  index_2: ${index_2}  board: ${board[index_1][index_2]}`);
+        if (board[index_1][index_2] === "") {
+            btn.innerHTML = "";
+        }
+
+        //console.log(board[index_1][index_2]);
+        // show preview
+        // if empty remove preview (innerHTML = "")
+    }
+    // ================
+    return { playGame, showPreview, removePreview };
 })();
 
 // Game factory function (for the flow of the game)
+// connectGUI should tell game what the user interact with,
+// game should do everything that needs to be done, all calls if possible from here
 const game = (function () {
 
     // status is used to show the correct text, especial if some player wants to enter name and
@@ -111,20 +195,20 @@ const game = (function () {
     let status = true;
 
     const renderText = (optional = "") => {
-        
+
 
         // I need one more condition for the case that the game is over,
         // - winner or board full
         // in that case name change should not be rendered
         if (optional === "player1Button" || optional === "player2Button") {
             console.log("player1 want to change name, render text...");
-            
+
             // need to know which turn it is
             let playerSign = gameBoard.getLastSignSet();
             let player1Name = player1.getName();
             let player2Name = player2.getName();
             // check which turn it is to choose what to render
-            if(getStatus() === true) {
+            if (getStatus() === true) {
                 let textOutput = "";
                 if (playerSign === "O") { // Player 1 turn
                     textOutput = `${player1Name} it's your turn`;
@@ -142,7 +226,7 @@ const game = (function () {
                 }
                 gameRenderText.innerHTML = textOutput;
             }
-        }       
+        }
         else if (optional === "winner") {
             console.log("winner was found");
             let textOutput = "";
@@ -230,9 +314,9 @@ const game = (function () {
             textOutput += " it's your turn";
             gameRenderText.innerHTML = textOutput;
         }
-        
 
-        
+
+
 
     }
 
@@ -352,8 +436,25 @@ const game = (function () {
 
     // check if button that was pressed is empty or not
     const checkForEmptyButton = (btn) => {
+        /*
+        Old version checked if button is empty using innerHTML,
+        but to implement a preview for the user, new check uses
+        the actual board array to find out if button is empty.
+        If there are problems implement old version again
+        // old version
         let content = btn.innerHTML;
         if (content === "") return true
+        return false;
+        */
+        // new version
+        let data_id = btn.getAttribute("data-id").split(" "); // get data-id from button(=equal to index in board array)
+        let index_1 = data_id[0];
+        let index_2 = data_id[1];
+        const board = gameBoard.getBoardArray();
+        //console.log(`index_1: ${index_1}  index_2: ${index_2}  board: ${board[index_1][index_2]}`);
+        if (board[index_1][index_2] === "") {
+            return true
+        }
         return false;
     }
 
@@ -382,6 +483,7 @@ const game = (function () {
 })();
 
 // Gameboard factory function
+// should set or return
 const gameBoard = (function () {
     let lastSignSet = "";
     let board =
@@ -610,6 +712,7 @@ const gameBoard = (function () {
 })();
 
 // Player factory function
+// should only set or return
 const player = function (playerSign) {
     let name = "";
     let wins = 0;
