@@ -52,26 +52,31 @@ newGameButton.addEventListener("click", () => {
     game.newGame();
 })
 
-/* this button represent the game loop */
-buttons.forEach((btn) => {
-    btn.addEventListener("click", (event) => {
-        const btn = event.target;
-        connectGUI.playGame(btn);
-    })
-})
 
 // feature: show preview
 buttons.forEach((btn) => {
     btn.addEventListener("mouseover", (event) => {
         const btn = event.target;
-        connectGUI.showPreview(btn);
+        game.showPreview(btn);
     })
 })
+
 // feature: show preview 
 buttons.forEach((btn) => {
     btn.addEventListener("mouseout", (event) => {
         const btn = event.target;
-        connectGUI.removePreview(btn);
+        game.removePreview(btn);
+    })
+})
+
+/* this button represent the game loop */
+buttons.forEach((btn) => {
+    btn.addEventListener("click", (event) => {
+        const btn = event.target;
+        connectGUI.playGame(btn);
+        // if buttons is pressed, remove preview, so if preview is shown,
+        // it will show the player sign set in the board
+        game.removePreview(btn);
     })
 })
 
@@ -115,72 +120,7 @@ connectGUI = (function () {
         game.renderText();
     }
 
-    // work in progress
-    // both methods should go into game factory function
-    const showPreview = (btn) => {
-        // show preview only if the game is running
-        let status = game.getStatus();
-        if(status === false) return;
-        console.log(`status: ${status}`);
-        let opacity = 0.9;
-        // check if board array is empty at that space
-        let data_id = btn.getAttribute("data-id").split(" "); // get data-id from button(=equal to index in board array)
-        let index_1 = data_id[0];
-        let index_2 = data_id[1];
-        const board = gameBoard.getBoardArray();
-        //console.log(`in: index_1: ${index_1}  index_2: ${index_2}`);
-        // if empty show preview
-        if (board[index_1][index_2] === "") {
-            //console.log("show preview");
-            // get last sign to know which players turn is now
-            // set sign in inner html  
-            let lastSign = gameBoard.getLastSignSet();
-            // if lastSign is empty, preview "X" because it is the first turn in the game
-            // if lastSign is "X", preview "O"
-            // if lastSign is "O" preview "X" 
-            switch (lastSign) {     
-                case "":
-                    btn.innerHTML = "X";
-                    btn.style.opacity = opacity;
-                    break;
-                case "O":
-                    btn.innerHTML = "X";
-                    btn.style.opacity = opacity;
-                    break;
-                case "X":
-                    btn.innerHTML = "O";
-                    btn.style.opacity = opacity;
-                    break;
-                default:
-                    console.log("Shouldn't see me.");
-                    break;
-              
-            }
-            // if lastSign is "X", preview "O"
-            // if lastSign is "O" preview "X"    
-        }
-    }
-
-    const removePreview = (btn) => {
-        btn.style.opacity = 1;
-        // check if board array is empty at that space
-        // check if board array is empty at that space
-        let data_id = btn.getAttribute("data-id").split(" "); // get data-id from button(=equal to index in board array)
-        let index_1 = data_id[0];
-        let index_2 = data_id[1];
-        //console.log(`out: index_1: ${index_1}  index_2: ${index_2}`);
-        const board = gameBoard.getBoardArray();
-        //console.log(`index_1: ${index_1}  index_2: ${index_2}  board: ${board[index_1][index_2]}`);
-        if (board[index_1][index_2] === "") {
-            btn.innerHTML = "";
-        }
-
-        //console.log(board[index_1][index_2]);
-        // show preview
-        // if empty remove preview (innerHTML = "")
-    }
-    // ================
-    return { playGame, showPreview, removePreview };
+    return { playGame };
 })();
 
 // Game factory function (for the flow of the game)
@@ -193,6 +133,21 @@ const game = (function () {
     // true = game is running, false = winner was found or draw,
     // changed from "connectGUI"(set to "false") and "newGame/restartGame"(set to "true")
     let status = true;
+
+    // feature animate placeholder text in player1 and player2 input fields
+    let index = 0;
+    let placeholderText = "Enter name...";
+    const animatePlaceholderText = () => {
+        player1Input.placeholder += placeholderText[index];
+        player2Input.placeholder += placeholderText[index];
+        index += 1
+        if (index === placeholderText.length + 1) {
+            index = 0;
+            player1Input.placeholder = "";
+            player2Input.placeholder = "";
+        }
+    }
+    setInterval(animatePlaceholderText, 200);
 
     const renderText = (optional = "") => {
 
@@ -479,7 +434,75 @@ const game = (function () {
         })
     }
 
-    return { setStatus, getStatus, renderText, renderStatistics, setTurn, setWinner, setDraw, getBoardArray, outputBoardArray, checkForWinner, checkForEmptyButton, checkForEmptySpot, restartGame, newGame, enableBoardButtons, disableBoardButtons };
+    const showPreview = (btn) => {
+        // show preview only if the game is running
+        let status = game.getStatus();
+        if (status === false) return;
+        console.log(`status: ${status}`);
+        let opacity = 0.9;
+        // check if board array is empty at that space
+        let data_id = btn.getAttribute("data-id").split(" "); // get data-id from button(=equal to index in board array)
+        let index_1 = data_id[0];
+        let index_2 = data_id[1];
+        const board = gameBoard.getBoardArray();
+        //console.log(`in: index_1: ${index_1}  index_2: ${index_2}`);
+        // if empty show preview
+        if (board[index_1][index_2] === "") {
+            //console.log("show preview");
+            // get last sign to know which players turn is now
+            // set sign in inner html  
+            let lastSign = gameBoard.getLastSignSet();
+            // if lastSign is empty, preview "X" because it is the first turn in the game
+            // if lastSign is "X", preview "O"
+            // if lastSign is "O" preview "X" 
+            switch (lastSign) {
+                case "":
+                    btn.innerHTML = "X";
+                    btn.style.opacity = opacity;
+                    btn.style.color = "grey";
+                    break;
+                case "O":
+                    btn.innerHTML = "X";
+                    btn.style.opacity = opacity;
+                    btn.style.color = "grey";
+                    break;
+                case "X":
+                    btn.innerHTML = "O";
+                    btn.style.opacity = opacity;
+                    btn.style.color = "grey";
+                    break;
+                default:
+                    console.log("Shouldn't see me.");
+                    break;
+
+            }
+            // if lastSign is "X", preview "O"
+            // if lastSign is "O" preview "X"    
+        }
+    }
+
+    const removePreview = (btn) => {
+        btn.style.opacity = 1;
+        btn.style.color = "#000";
+        // check if board array is empty at that space
+        // check if board array is empty at that space
+        let data_id = btn.getAttribute("data-id").split(" "); // get data-id from button(=equal to index in board array)
+        let index_1 = data_id[0];
+        let index_2 = data_id[1];
+        //console.log(`out: index_1: ${index_1}  index_2: ${index_2}`);
+        const board = gameBoard.getBoardArray();
+        //console.log(`index_1: ${index_1}  index_2: ${index_2}  board: ${board[index_1][index_2]}`);
+        if (board[index_1][index_2] === "") {
+            btn.innerHTML = "";
+        }
+
+        //console.log(board[index_1][index_2]);
+        // show preview
+        // if empty remove preview (innerHTML = "")
+    }
+
+
+    return { setStatus, getStatus, renderText, renderStatistics, setTurn, setWinner, setDraw, getBoardArray, outputBoardArray, checkForWinner, checkForEmptyButton, checkForEmptySpot, restartGame, newGame, enableBoardButtons, disableBoardButtons, showPreview, removePreview };
 })();
 
 // Gameboard factory function
@@ -750,7 +773,7 @@ const player = function (playerSign) {
     return { setName, setWins, setDraws, setLost, resetStatistic, getName, getSign, getWins, getDraws, getLost };
 }
 
-// Create two player objects
+// Create two player objects 
 // connectGUI.renderBoard();
 const player1 = player("X");
 const player2 = player("O");
