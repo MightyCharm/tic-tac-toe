@@ -157,37 +157,44 @@ const game = (function () {
     setInterval(animatePlaceholderText, 200);
 
     const renderText = (optional = "") => {
+        // console.log(`renderText optional: ${optional}`);
+        // console.log(getStatus());
+        let playerSign = gameBoard.getLastSignSet();
+        let player1Name = player1.getName();
+        let player2Name = player2.getName();
+        let textOutput = ""
+        // if no player name was entered, set player name to standard
+        if(player1Name === "") {
+            player1Name = "Player 1";
+        }
+        if (player2Name === "") {
+            player2Name = "Player 2";
+        }
 
-        if (optional === "player1Button" || optional === "player2Button") {
-            console.log("player1 want to change name, render text...");
-
+        if (optional === "player1Button" || optional === "player2Button" ) {
             // need to know which turn it is
-            let playerSign = gameBoard.getLastSignSet();
-            let player1Name = player1.getName();
-            let player2Name = player2.getName();
-            // check which turn it is to choose what to render
+            // check if status is true(=game is running) or false (=game over)
+            // check which player turn it is to choose what to render
             if (getStatus() === true) {
-                let textOutput = "";
+                
                 if (playerSign === "O") { // Player 1 turn
                     textOutput = `${player1Name} it's your turn`;
                 }
                 else if (playerSign === "X") { // Player 2 turn
                     textOutput = `${player2Name} it's your turn`;
-                } // first turn of the game, Player 1 turn
-                else {
-                    if (player1Name === "") {
-                        textOutput = "Player 1 it's your turn 2";
-
-                    } else {
-                        textOutput = `${player1Name} it's your turn 1`;
-                    }
+                } 
+                // first turn of the game, Player 1 turn
+                else {  
+                    textOutput = `${player1Name} it's your turn`;       
                 }
-                gameRenderText.innerHTML = textOutput;
+            }
+            else  {
+                console.log("name was entered but game is over, do nothing...");
+                return;
             }
         }
-        else if (optional === "winner") {
-            // console.log("winner was found");
-            let textOutput = "";
+        else if (optional === "winner") {      
+            //let textOutput = "";
             // get player name who won the game
             // insert player name into text string
             let signWinner;
@@ -196,82 +203,39 @@ const game = (function () {
             signWinner = gameBoard.getLastSignSet();
             switch (signWinner) {
                 case "X":
-                    nameWinner = player1.getName();
-                    if (nameWinner === "") {
-                        textOutput += "Player 1";
-                    }
-                    else {
-                        textOutput += nameWinner;
-                    }
+                    textOutput += `${player1Name}`;
                     break;
-                case "O":
-                    nameWinner = player2.getName();
-
-                    if (nameWinner === "") {
-                        textOutput += "Player 2";
-                    }
-                    else {
-                        textOutput += nameWinner;
-                    }
+                case "O":                   
+                    textOutput += `${player2Name}`; 
                     break;
                 default:
                     console.log("Something went wrong, you shouldn't see me!");
                     break;
             }
             textOutput += " has won the game!"
-            gameRenderText.innerHTML = textOutput;
-
         }
         else if (optional === "boardFull") {
-            let textOutput = "";
-            console.log("no space on gameboard!");
             // gameboard is full, insert DRAW into text string
             textOutput = "Board is full. Draw!";
-            gameRenderText.innerHTML = textOutput;
         }
         else if (optional === "restart") {
-            let textOutput = "";
-            let name = player1.getName();
-            if (name === "") {
-                textOutput = "Player 1 it's your turn";
-            }
-            else {
-                textOutput = `${name} it's your turn`;
-            }
-            gameRenderText.innerHTML = textOutput;
-
+            textOutput = `${player1Name} it's your turn`;   
         }
         else if (optional === "new-game") {
-            let textOutput = "";
-            textOutput = "Player 1 it's your turn";
-            gameRenderText.innerHTML = textOutput;
+            textOutput = `${player1Name} it's your turn`;    
         }
         // normal call if game is running
-        else if (optional === "") {
-            // get player name
-            // insert player name into string
-            let textOutput = "";
-            let name = "";
+        else if (optional === "") {     
             let playerSign = gameBoard.getLastSignSet();
             if (playerSign === "O") {
-                name = player1.getName();
-                if (name === "") {
-                    textOutput += "Player 1";
-                } else {
-                    textOutput += name;
-                }
+                textOutput += player1Name;     
             }
             else {
-                name = player2.getName();
-                if (name === "") {
-                    textOutput += "Player 2";
-                } else {
-                    textOutput += name;
-                }
+                textOutput += player2Name;
             }
             textOutput += " it's your turn";
-            gameRenderText.innerHTML = textOutput;
         }
+        gameRenderText.innerHTML = textOutput;
     }
 
     const restartGame = () => {
@@ -739,17 +703,16 @@ const gameBoard = (function () {
         })
     }
 
-    // work in progress
     // methods get called from methods that check rows and columns for a winner
-    const markWinner = (type, para_1) => {
+    const markWinner = (type, para) => {
         const buttonColor = "#ABD2FA";
-        if (type === "row") {
-            switch (para_1) {
-                case 0:
-                    buttons.forEach((btn) => {
-                        let data_id = btn.getAttribute("data-id").split(" ");
-                        let index_1 = data_id[0];
-                        let index_2 = data_id[1];
+        buttons.forEach((btn) => {
+            let data_id = btn.getAttribute("data-id").split(" ");
+            let index_1 = data_id[0];
+            let index_2 = data_id[1];
+            if (type === "row") {
+                switch (para) {
+                    case 0:
                         if (index_1 === "0" && index_2 === "0") {
                             btn.style.backgroundColor = buttonColor;
                         }
@@ -759,13 +722,8 @@ const gameBoard = (function () {
                         if (index_1 === "0" && index_2 === "2") {
                             btn.style.backgroundColor = buttonColor;
                         }
-                    })
-                    break;
-                case 1:
-                    buttons.forEach((btn) => {
-                        let data_id = btn.getAttribute("data-id").split(" ");
-                        let index_1 = data_id[0];
-                        let index_2 = data_id[1];
+                        break;
+                    case 1:
                         if (index_1 === "1" && index_2 === "0") {
                             btn.style.backgroundColor = buttonColor;
                         }
@@ -775,13 +733,8 @@ const gameBoard = (function () {
                         if (index_1 === "1" && index_2 === "2") {
                             btn.style.backgroundColor = buttonColor;
                         }
-                    })
-                    break;
-                case 2:
-                    buttons.forEach((btn) => {
-                        let data_id = btn.getAttribute("data-id").split(" ");
-                        let index_1 = data_id[0];
-                        let index_2 = data_id[1];
+                        break;
+                    case 2:
                         if (index_1 === "2" && index_2 === "0") {
                             btn.style.backgroundColor = buttonColor;
                         }
@@ -791,155 +744,126 @@ const gameBoard = (function () {
                         if (index_1 === "2" && index_2 === "2") {
                             btn.style.backgroundColor = buttonColor;
                         }
-                    })
-                    break;
+                        break;
                 }
             }
             else if (type === "column") {
-                switch (para_1) {
+                switch (para) {
                     case 0:
-                        
-                        buttons.forEach( (btn) => {
-                            let data_id = btn.getAttribute("data-id").split(" ");
-                            let index_1 = data_id[0];
-                            let index_2 = data_id[1];
-                            if (index_1 === "0" && index_2 === "0") {
-                                btn.style.backgroundColor = buttonColor;
-                            }
-                            if (index_1 === "1" && index_2 === "0") {
-                                btn.style.backgroundColor = buttonColor;
-                            }
-                            if (index_1 === "2" && index_2 === "0") {
-                                btn.style.backgroundColor = buttonColor;
-                            }
-
-                        })
+                        if (index_1 === "0" && index_2 === "0") {
+                            btn.style.backgroundColor = buttonColor;
+                        }
+                        if (index_1 === "1" && index_2 === "0") {
+                            btn.style.backgroundColor = buttonColor;
+                        }
+                        if (index_1 === "2" && index_2 === "0") {
+                            btn.style.backgroundColor = buttonColor;
+                        }
                         break;
                     case 1:
-                        buttons.forEach( (btn) => {
-                            let data_id = btn.getAttribute("data-id").split(" ");
-                            let index_1 = data_id[0];
-                            let index_2 = data_id[1];
-                            if (index_1 === "0" && index_2 === "1") {
-                                btn.style.backgroundColor = buttonColor;
-                            }
-                            if (index_1 === "1" && index_2 === "1") {
-                                btn.style.backgroundColor = buttonColor;
-                            }
-                            if (index_1 === "2" && index_2 === "1") {
-                                btn.style.backgroundColor = buttonColor;
-                            }
-
-                        })
+                        if (index_1 === "0" && index_2 === "1") {
+                            btn.style.backgroundColor = buttonColor;
+                        }
+                        if (index_1 === "1" && index_2 === "1") {
+                            btn.style.backgroundColor = buttonColor;
+                        }
+                        if (index_1 === "2" && index_2 === "1") {
+                            btn.style.backgroundColor = buttonColor;
+                        }
                         break;
                     case 2:
-                        buttons.forEach( (btn) => {
-                            let data_id = btn.getAttribute("data-id").split(" ");
-                            let index_1 = data_id[0];
-                            let index_2 = data_id[1];
-                            if (index_1 === "0" && index_2 === "2") {
-                                btn.style.backgroundColor = buttonColor;
-                            }
-                            if (index_1 === "1" && index_2 === "2") {
-                                btn.style.backgroundColor = buttonColor;
-                            }
-                            if (index_1 === "2" && index_2 === "2") {
-                                btn.style.backgroundColor = buttonColor;
-                            }
-
-                        })
+                        if (index_1 === "0" && index_2 === "2") {
+                            btn.style.backgroundColor = buttonColor;
+                        }
+                        if (index_1 === "1" && index_2 === "2") {
+                            btn.style.backgroundColor = buttonColor;
+                        }
+                        if (index_1 === "2" && index_2 === "2") {
+                            btn.style.backgroundColor = buttonColor;
+                        }
                         break;
-
                 }
             }
             else if (type === "crossLeftToRight") {
-                console.log("cross left to right");
-                buttons.forEach( (btn) => {
-                    let data_id = btn.getAttribute("data-id").split(" ");
-                    let index_1 = data_id[0];
-                    let index_2 = data_id[1];
-                    if (index_1 === "0" && index_2 === "0") {
-                        btn.style.backgroundColor = buttonColor;
-                    }
-                    if (index_1 === "1" && index_2 === "1") {
-                        btn.style.backgroundColor = buttonColor;
-                    }
-                    if (index_1 === "2" && index_2 === "2") {
-                        btn.style.backgroundColor = buttonColor;
-                    }
-                })
+                if (index_1 === "0" && index_2 === "0") {
+                    btn.style.backgroundColor = buttonColor;
+                }
+                if (index_1 === "1" && index_2 === "1") {
+                    btn.style.backgroundColor = buttonColor;
+                }
+                if (index_1 === "2" && index_2 === "2") {
+                    btn.style.backgroundColor = buttonColor;
+                }
             }
             else if (type === "crossRightToLeft") {
-                console.log("cross right to left");
-                buttons.forEach( (btn) => {
-                    let data_id = btn.getAttribute("data-id").split(" ");
-                    let index_1 = data_id[0];
-                    let index_2 = data_id[1];
-                    if (index_1 === "0" && index_2 === "2") {
-                        btn.style.backgroundColor =  buttonColor;
-                    }
-                    if (index_1 === "1" && index_2 === "1") {
-                        btn.style.backgroundColor = buttonColor;
-                    }
-                    if (index_1 === "2" && index_2 === "0") {
-                        btn.style.backgroundColor = buttonColor;
-                    }
-                })
+                let data_id = btn.getAttribute("data-id").split(" ");
+                let index_1 = data_id[0];
+                let index_2 = data_id[1];
+                if (index_1 === "0" && index_2 === "2") {
+                    btn.style.backgroundColor = buttonColor;
+                }
+                if (index_1 === "1" && index_2 === "1") {
+                    btn.style.backgroundColor = buttonColor;
+                }
+                if (index_1 === "2" && index_2 === "0") {
+                    btn.style.backgroundColor = buttonColor;
+                }
             }
-        }
-
-        const clearMarkedWinner = () => {
-            buttons.forEach((btn) => {
-                btn.style.backgroundColor = "#fff";
-            })
-        }
-
-        return { markWinner, clearMarkedWinner, setBoardButtons, getBoardArray, clearBoardArray, clearLastSignSet, outputBoardArray, checkRows, checkColumns, checkCrossLeftToRight, checkCrossRightToLeft, checkForEmptySpot, getLastSignSet, clearSignsFromButtons };
-    })();
-
-    /*
-        factory function player,
-        manages player statistics and name
-    */
-    const player = function (playerSign) {
-        let name = "";
-        let wins = 0;
-        let draws = 0;
-        let lost = 0;
-        const sign = playerSign;
-
-        const setName = (value) => {
-            name = value;
-        }
-
-        const setWins = () => {
-            wins += 1;
-        }
-
-        const setDraws = () => {
-            draws += 1;
-        }
-
-        const setLost = () => {
-            lost += 1;
-        }
-        const resetStatistic = () => {
-            wins = 0;
-            draws = 0;
-            lost = 0;
-        }
-        const getName = () => name;
-        const getSign = () => sign;
-
-        const getWins = () => wins;
-        const getDraws = () => draws;
-        const getLost = () => lost;
-
-        return { setName, setWins, setDraws, setLost, resetStatistic, getName, getSign, getWins, getDraws, getLost };
+        })
     }
 
-    // Create two player objects 
-    // connectGUI.renderBoard();
-    const player1 = player("X");
-    const player2 = player("O");
-    game.renderStatistics();
+    const clearMarkedWinner = () => {
+        buttons.forEach((btn) => {
+            btn.style.backgroundColor = "#fff";
+        })
+    }
+
+    return { setBoardButtons, getBoardArray, clearBoardArray, clearLastSignSet, outputBoardArray, checkRows, checkColumns, checkCrossLeftToRight, checkCrossRightToLeft, checkForEmptySpot, getLastSignSet, clearSignsFromButtons, markWinner, clearMarkedWinner, };
+})();
+
+/*
+    factory function player,
+    manages player statistics and name
+*/
+const player = function (playerSign) {
+    let name = "";
+    let wins = 0;
+    let draws = 0;
+    let lost = 0;
+    const sign = playerSign;
+
+    const setName = (value) => {
+        name = value;
+    }
+
+    const setWins = () => {
+        wins += 1;
+    }
+
+    const setDraws = () => {
+        draws += 1;
+    }
+
+    const setLost = () => {
+        lost += 1;
+    }
+    const resetStatistic = () => {
+        wins = 0;
+        draws = 0;
+        lost = 0;
+    }
+    const getName = () => name;
+    const getSign = () => sign;
+
+    const getWins = () => wins;
+    const getDraws = () => draws;
+    const getLost = () => lost;
+
+    return { setName, setWins, setDraws, setLost, resetStatistic, getName, getSign, getWins, getDraws, getLost };
+}
+
+// Create two player objects 
+// connectGUI.renderBoard();
+const player1 = player("X");
+const player2 = player("O");
+game.renderStatistics();
