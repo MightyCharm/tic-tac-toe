@@ -16,10 +16,36 @@ const player2Lost = document.querySelector("#player2-lost-value");
 // get textbox in GUI
 const gameRenderText = document.querySelector("#box-game-info-text");
 gameRenderText.innerHTML = "Player 1 it's your turn";
-// get all buttons that represent the gameboard
+
+
+// adding event listeners to the buttons that represent the board array in the GUI
 const buttons = document.querySelectorAll("#btn");
+// add event listener for feature show preview
+buttons.forEach((btn) => {
+    btn.addEventListener("mouseover", (event) => {
+        const btn = event.target;
+        game.showPreview(btn);
+    })
+})
+//add event listener for feature show preview 
+buttons.forEach((btn) => {
+    btn.addEventListener("mouseout", (event) => {
+        const btn = event.target;
+        game.removePreview(btn);
+    })
+})
+// add event listener for running the game
+buttons.forEach((btn) => {
+    btn.addEventListener("click", (event) => {
+        const btn = event.target;
+        connectGUI.playGame(btn);
+        // if buttons is pressed, player insert sign then remove preview,
+        // so if preview is shown, it will show the player sign set in the board instead
+        game.removePreview(btn);
+    })
+})
 
-
+// event listeners for player input name
 player1Button.addEventListener("click", () => {
     // Only change the name if user has actual entered something new into input field
     if (player1Input.value === player1.getName()) return;
@@ -32,6 +58,7 @@ player1Button.addEventListener("click", () => {
     game.renderText("player1Button");
 })
 
+// event listeners for player input name
 player2Button.addEventListener("click", () => {
     // Only change the name if user has actual entered something new into input field
     if (player2Input.value === player2.getName()) return;
@@ -44,43 +71,21 @@ player2Button.addEventListener("click", () => {
     game.renderText("player2Button");
 })
 
+// event listener for restarting the game
 restartButton.addEventListener("click", () => {
     game.restartGame();
 })
 
+// event listener for starting a complete new game
 newGameButton.addEventListener("click", () => {
     game.newGame();
 })
 
 
-// feature: show preview
-buttons.forEach((btn) => {
-    btn.addEventListener("mouseover", (event) => {
-        const btn = event.target;
-        game.showPreview(btn);
-    })
-})
-
-// feature: show preview 
-buttons.forEach((btn) => {
-    btn.addEventListener("mouseout", (event) => {
-        const btn = event.target;
-        game.removePreview(btn);
-    })
-})
-
-/* this button represent the game loop */
-buttons.forEach((btn) => {
-    btn.addEventListener("click", (event) => {
-        const btn = event.target;
-        connectGUI.playGame(btn);
-        // if buttons is pressed, remove preview, so if preview is shown,
-        // it will show the player sign set in the board
-        game.removePreview(btn);
-    })
-})
-
-// Object for displaying the game on the page
+/*
+    factory function connectGUI,
+    responsible for checking player input and calling game object
+*/
 connectGUI = (function () {
 
     //  main loop of the game, do something if button was pressed
@@ -88,7 +93,6 @@ connectGUI = (function () {
         // check if button that was pressed is empty
         let empty = game.checkForEmptyButton(btn);
 
-        console.log(`empty button: ${empty}`);
         // if button was not empty, check if there is at least on button empty on the gameboard
         if (empty === false) {
             return
@@ -123,9 +127,11 @@ connectGUI = (function () {
     return { playGame };
 })();
 
-// Game factory function (for the flow of the game)
-// connectGUI should tell game what the user interact with,
-// game should do everything that needs to be done, all calls if possible from here
+
+/* 
+    factory function game,
+    responsible for the flow of the game
+*/
 const game = (function () {
 
     // status is used to show the correct text, especial if some player wants to enter name and
@@ -147,14 +153,11 @@ const game = (function () {
             player2Input.placeholder = "";
         }
     }
+    // calls method to simulate typing into the input fields
     setInterval(animatePlaceholderText, 200);
 
     const renderText = (optional = "") => {
 
-
-        // I need one more condition for the case that the game is over,
-        // - winner or board full
-        // in that case name change should not be rendered
         if (optional === "player1Button" || optional === "player2Button") {
             console.log("player1 want to change name, render text...");
 
@@ -183,7 +186,7 @@ const game = (function () {
             }
         }
         else if (optional === "winner") {
-            console.log("winner was found");
+            // console.log("winner was found");
             let textOutput = "";
             // get player name who won the game
             // insert player name into text string
@@ -269,17 +272,13 @@ const game = (function () {
             textOutput += " it's your turn";
             gameRenderText.innerHTML = textOutput;
         }
-
-
-
-
     }
 
     const restartGame = () => {
         gameBoard.clearBoardArray();
         gameBoard.clearLastSignSet();
-        // clear text inside buttons to display empty board
-        gameBoard.clearSignsFromButtons();
+        gameBoard.clearSignsFromButtons(); // clear text inside buttons to display empty board
+        gameBoard.clearMarkedWinner(); // clear colored buttons winner last game
         game.setStatus(true);
         // reset text
         game.renderText("restart");
@@ -288,13 +287,10 @@ const game = (function () {
     }
 
     const newGame = () => {
-        // clear board array
         gameBoard.clearBoardArray();
-        // clear lastSignSet
         gameBoard.clearLastSignSet();
-        // clear text inside buttons to display empty board
-        gameBoard.clearSignsFromButtons();
-        // enable input and ok button for new game
+        gameBoard.clearSignsFromButtons(); // clear text inside buttons to display empty board
+        gameBoard.clearMarkedWinner(); // clear colored buttons winner last game
         player1Input.disabled = false;
         player2Input.disabled = false;
         player1Button.disabled = false;
@@ -377,15 +373,23 @@ const game = (function () {
         // if one check is true cancel rest return true (winner was found)
         // if all checks are false, return false (no winner was found)
         result = gameBoard.checkRows(player);
-        if (result === true) return result;
+        if (result === true) {
+            return result;
+        }
 
         result = gameBoard.checkColumns(player);
-        if (result === true) return result;
+        if (result === true) {
+            return result;
+        }
 
         result = gameBoard.checkCrossLeftToRight(player);
-        if (result === true) return result;
+        if (result === true) {
+            return result;
+        }
 
         result = gameBoard.checkCrossRightToLeft(player);
+        if (result === true) {
+        }
         return result;
     }
 
@@ -438,7 +442,6 @@ const game = (function () {
         // show preview only if the game is running
         let status = game.getStatus();
         if (status === false) return;
-        console.log(`status: ${status}`);
         let opacity = 0.9;
         // check if board array is empty at that space
         let data_id = btn.getAttribute("data-id").split(" "); // get data-id from button(=equal to index in board array)
@@ -505,9 +508,12 @@ const game = (function () {
     return { setStatus, getStatus, renderText, renderStatistics, setTurn, setWinner, setDraw, getBoardArray, outputBoardArray, checkForWinner, checkForEmptyButton, checkForEmptySpot, restartGame, newGame, enableBoardButtons, disableBoardButtons, showPreview, removePreview };
 })();
 
-// Gameboard factory function
-// should set or return
+/* 
+    factory function gameBoard,
+    responsible for everything that has to do with the board array and the board gui
+*/
 const gameBoard = (function () {
+
     let lastSignSet = "";
     let board =
         [
@@ -516,15 +522,12 @@ const gameBoard = (function () {
             ["", "", ""]
         ];
 
-    // works with lastSignSet variables
+    // sets player input into GUI
+    // sets player input into board array
     const setBoardButtons = (btn) => {
-        // 1. set player input in GUI
-        // 2. set player input in board array
         let data_id = btn.getAttribute("data-id").split(" "); // get data-id from button(=equal to index in board array)
         let index_1 = data_id[0];
         let index_2 = data_id[1];
-        //console.log(`index_1: ${index_1} index_2: ${index_2}`);
-        // console.log(`btn: ${btn.getAttribute("data-id")}`);
         if (lastSignSet === "") {
             btn.innerHTML = player1.getSign();
             lastSignSet = player1.getSign();
@@ -579,9 +582,7 @@ const gameBoard = (function () {
     };
 
     const checkRows = (player) => {
-        //let playerSign = player.getSign();
         let playerSign = getLastSignSet();
-        // console.log(`playerSign: ${playerSign}`)
         let previousIteration;
         let currentIteration;
         let winner = true;
@@ -607,6 +608,7 @@ const gameBoard = (function () {
             }
             // check after one row if winner is true
             if (winner === true) {
+                markWinner("row", i);
                 break;
             }
         }
@@ -640,6 +642,7 @@ const gameBoard = (function () {
                 previousIteration = currentIteration;
             }
             if (winner === true) {
+                markWinner("column", j);
                 break;
             }
         }
@@ -674,6 +677,9 @@ const gameBoard = (function () {
             }
             previousIteration = currentIteration;
         }
+        if (winner === true) {
+            markWinner("crossLeftToRight");
+        }
         return winner;
     }
 
@@ -704,7 +710,9 @@ const gameBoard = (function () {
             index_2--;
             previousIteration = currentIteration;
         }
-
+        if (winner === true) {
+            markWinner("crossRightToLeft");
+        }
         return winner;
     }
 
@@ -731,50 +739,207 @@ const gameBoard = (function () {
         })
     }
 
-    return { setBoardButtons, getBoardArray, clearBoardArray, clearLastSignSet, outputBoardArray, checkRows, checkColumns, checkCrossLeftToRight, checkCrossRightToLeft, checkForEmptySpot, getLastSignSet, clearSignsFromButtons };
-})();
+    // work in progress
+    // methods get called from methods that check rows and columns for a winner
+    const markWinner = (type, para_1) => {
+        const buttonColor = "#ABD2FA";
+        if (type === "row") {
+            switch (para_1) {
+                case 0:
+                    buttons.forEach((btn) => {
+                        let data_id = btn.getAttribute("data-id").split(" ");
+                        let index_1 = data_id[0];
+                        let index_2 = data_id[1];
+                        if (index_1 === "0" && index_2 === "0") {
+                            btn.style.backgroundColor = buttonColor;
+                        }
+                        if (index_1 === "0" && index_2 === "1") {
+                            btn.style.backgroundColor = buttonColor;
+                        }
+                        if (index_1 === "0" && index_2 === "2") {
+                            btn.style.backgroundColor = buttonColor;
+                        }
+                    })
+                    break;
+                case 1:
+                    buttons.forEach((btn) => {
+                        let data_id = btn.getAttribute("data-id").split(" ");
+                        let index_1 = data_id[0];
+                        let index_2 = data_id[1];
+                        if (index_1 === "1" && index_2 === "0") {
+                            btn.style.backgroundColor = buttonColor;
+                        }
+                        if (index_1 === "1" && index_2 === "1") {
+                            btn.style.backgroundColor = buttonColor;
+                        }
+                        if (index_1 === "1" && index_2 === "2") {
+                            btn.style.backgroundColor = buttonColor;
+                        }
+                    })
+                    break;
+                case 2:
+                    buttons.forEach((btn) => {
+                        let data_id = btn.getAttribute("data-id").split(" ");
+                        let index_1 = data_id[0];
+                        let index_2 = data_id[1];
+                        if (index_1 === "2" && index_2 === "0") {
+                            btn.style.backgroundColor = buttonColor;
+                        }
+                        if (index_1 === "2" && index_2 === "1") {
+                            btn.style.backgroundColor = buttonColor;
+                        }
+                        if (index_1 === "2" && index_2 === "2") {
+                            btn.style.backgroundColor = buttonColor;
+                        }
+                    })
+                    break;
+                }
+            }
+            else if (type === "column") {
+                switch (para_1) {
+                    case 0:
+                        
+                        buttons.forEach( (btn) => {
+                            let data_id = btn.getAttribute("data-id").split(" ");
+                            let index_1 = data_id[0];
+                            let index_2 = data_id[1];
+                            if (index_1 === "0" && index_2 === "0") {
+                                btn.style.backgroundColor = buttonColor;
+                            }
+                            if (index_1 === "1" && index_2 === "0") {
+                                btn.style.backgroundColor = buttonColor;
+                            }
+                            if (index_1 === "2" && index_2 === "0") {
+                                btn.style.backgroundColor = buttonColor;
+                            }
 
-// Player factory function
-// should only set or return
-const player = function (playerSign) {
-    let name = "";
-    let wins = 0;
-    let draws = 0;
-    let lost = 0;
-    const sign = playerSign;
+                        })
+                        break;
+                    case 1:
+                        buttons.forEach( (btn) => {
+                            let data_id = btn.getAttribute("data-id").split(" ");
+                            let index_1 = data_id[0];
+                            let index_2 = data_id[1];
+                            if (index_1 === "0" && index_2 === "1") {
+                                btn.style.backgroundColor = buttonColor;
+                            }
+                            if (index_1 === "1" && index_2 === "1") {
+                                btn.style.backgroundColor = buttonColor;
+                            }
+                            if (index_1 === "2" && index_2 === "1") {
+                                btn.style.backgroundColor = buttonColor;
+                            }
 
-    const setName = (value) => {
-        name = value;
+                        })
+                        break;
+                    case 2:
+                        buttons.forEach( (btn) => {
+                            let data_id = btn.getAttribute("data-id").split(" ");
+                            let index_1 = data_id[0];
+                            let index_2 = data_id[1];
+                            if (index_1 === "0" && index_2 === "2") {
+                                btn.style.backgroundColor = buttonColor;
+                            }
+                            if (index_1 === "1" && index_2 === "2") {
+                                btn.style.backgroundColor = buttonColor;
+                            }
+                            if (index_1 === "2" && index_2 === "2") {
+                                btn.style.backgroundColor = buttonColor;
+                            }
+
+                        })
+                        break;
+
+                }
+            }
+            else if (type === "crossLeftToRight") {
+                console.log("cross left to right");
+                buttons.forEach( (btn) => {
+                    let data_id = btn.getAttribute("data-id").split(" ");
+                    let index_1 = data_id[0];
+                    let index_2 = data_id[1];
+                    if (index_1 === "0" && index_2 === "0") {
+                        btn.style.backgroundColor = buttonColor;
+                    }
+                    if (index_1 === "1" && index_2 === "1") {
+                        btn.style.backgroundColor = buttonColor;
+                    }
+                    if (index_1 === "2" && index_2 === "2") {
+                        btn.style.backgroundColor = buttonColor;
+                    }
+                })
+            }
+            else if (type === "crossRightToLeft") {
+                console.log("cross right to left");
+                buttons.forEach( (btn) => {
+                    let data_id = btn.getAttribute("data-id").split(" ");
+                    let index_1 = data_id[0];
+                    let index_2 = data_id[1];
+                    if (index_1 === "0" && index_2 === "2") {
+                        btn.style.backgroundColor =  buttonColor;
+                    }
+                    if (index_1 === "1" && index_2 === "1") {
+                        btn.style.backgroundColor = buttonColor;
+                    }
+                    if (index_1 === "2" && index_2 === "0") {
+                        btn.style.backgroundColor = buttonColor;
+                    }
+                })
+            }
+        }
+
+        const clearMarkedWinner = () => {
+            buttons.forEach((btn) => {
+                btn.style.backgroundColor = "#fff";
+            })
+        }
+
+        return { markWinner, clearMarkedWinner, setBoardButtons, getBoardArray, clearBoardArray, clearLastSignSet, outputBoardArray, checkRows, checkColumns, checkCrossLeftToRight, checkCrossRightToLeft, checkForEmptySpot, getLastSignSet, clearSignsFromButtons };
+    })();
+
+    /*
+        factory function player,
+        manages player statistics and name
+    */
+    const player = function (playerSign) {
+        let name = "";
+        let wins = 0;
+        let draws = 0;
+        let lost = 0;
+        const sign = playerSign;
+
+        const setName = (value) => {
+            name = value;
+        }
+
+        const setWins = () => {
+            wins += 1;
+        }
+
+        const setDraws = () => {
+            draws += 1;
+        }
+
+        const setLost = () => {
+            lost += 1;
+        }
+        const resetStatistic = () => {
+            wins = 0;
+            draws = 0;
+            lost = 0;
+        }
+        const getName = () => name;
+        const getSign = () => sign;
+
+        const getWins = () => wins;
+        const getDraws = () => draws;
+        const getLost = () => lost;
+
+        return { setName, setWins, setDraws, setLost, resetStatistic, getName, getSign, getWins, getDraws, getLost };
     }
 
-    const setWins = () => {
-        wins += 1;
-    }
-
-    const setDraws = () => {
-        draws += 1;
-    }
-
-    const setLost = () => {
-        lost += 1;
-    }
-    const resetStatistic = () => {
-        wins = 0;
-        draws = 0;
-        lost = 0;
-    }
-    const getName = () => name;
-    const getSign = () => sign;
-
-    const getWins = () => wins;
-    const getDraws = () => draws;
-    const getLost = () => lost;
-
-    return { setName, setWins, setDraws, setLost, resetStatistic, getName, getSign, getWins, getDraws, getLost };
-}
-
-// Create two player objects 
-// connectGUI.renderBoard();
-const player1 = player("X");
-const player2 = player("O");
-game.renderStatistics();
+    // Create two player objects 
+    // connectGUI.renderBoard();
+    const player1 = player("X");
+    const player2 = player("O");
+    game.renderStatistics();
