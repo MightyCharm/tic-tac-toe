@@ -76,7 +76,9 @@ body {
 }
 
 .player1-label-sign,
-.player2-label-sign {}
+.player2-label-sign {
+    justify-self: center;
+}
 
 .box-player1-mid-section,
 .box-player2-mid-section {
@@ -253,4 +255,84 @@ body {
 
 a {
     color: var(--color-link);
+}
+
+@media screen and (max-width: 1000px) {
+    .container {
+        grid-template-rows: 0.3fr 1fr 1fr 1fr 0.1fr;
+        grid-template-columns: 1fr 1fr;
+        padding-left: 1rem;
+    }
+
+    .box-header {
+        grid-row-start: 1;
+        grid-column-start: 1;
+    }
+
+    .box-player1 {
+        grid-row-start: 2;
+        grid-column-start: 1;
+    }
+
+    .box-board {
+        grid-row-start: 1;
+        grid-row-end: 4;
+        grid-column-start: 2;
+
+
+        width: 100%;
+        height: 100%;
+    }
+
+    .box-player2 {
+        grid-row-start: 3;
+        grid-column-start: 1;
+
+    }
+
+    .box-game-restart {
+        grid-row-start: 4;
+        grid-column-start: 2;
+
+        height: 70%;
+    }
+
+    .box-game-info {
+        grid-column-start: 1;
+        grid-row-start: 4;
+
+        justify-self: center;
+        align-self: center;
+    }
+
+    .box-reference {
+        grid-column-start: 2;
+        grid-row-start: 5;
+    }
+}
+
+@media screen and (max-width: 800px) {
+    .box-player1 {
+        font-size: 1.5rem;
+    }
+    .box-player2 {
+        font-size: 1.5rem;
+    }
+    .box-game-info {
+        font-size: 1.5rem;
+    }
+}
+
+@media screen and (max-width: 550px) {
+    .box-player1-top-section,
+    .box-player2-top-section {
+        grid-template-columns: 2fr 1fr;
+    }
+
+    .player1-wins-label,
+    .player1-draws-label,
+    .player2-wins-label,
+    .player2-draws-label {
+        border-right: 1px solid rgb(145, 143, 143);
+    }
 }
