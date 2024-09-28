@@ -5,12 +5,7 @@
 }
 
 :root {
-    /* --bg-color: rgb(114, 125, 129); */
-    /*--bg-color: rgb(11, 69, 102);*/
-    /*--bg-color-elements: rgb(255, 255, 255); */
-
     --bg-color: #091540;
-    /* --bg-color: grey; */
     --bg-color-elements: #fff;
     --color-elements: #000;
     --color-link: #fff;
@@ -18,7 +13,6 @@
 
 body {
     background-color: var(--bg-color);
-
 }
 
 /* main container */
@@ -74,7 +68,6 @@ body {
     display: grid;
     grid-template-columns: 1fr 1fr;
     align-items: center;
-
 }
 
 .player1-label-text,
@@ -83,9 +76,7 @@ body {
 }
 
 .player1-label-sign,
-.player2-label-sign {
-    
-}
+.player2-label-sign {}
 
 .box-player1-mid-section,
 .box-player2-mid-section {
@@ -115,15 +106,6 @@ body {
     width: 50%;
 
     font-size: 1.3rem;
-    
-}
-
-.player1-button:hover {
-  
-}
-
-.player2-button:hover {
-   
 }
 
 .box-player1-bottom-section,
@@ -170,13 +152,13 @@ body {
 }
 
 /* gameboard section */
-.box-board {  
+.box-board {
     justify-items: center;
     display: grid;
 
     grid-column-start: 2;
     grid-row-start: 2;
- 
+
     height: 100%;
 }
 
@@ -193,13 +175,11 @@ body {
 
 /* buttons */
 .btn {
-   
     background-color: white;
     font-size: 4rem;
 }
 
 .btn:hover {
-   
     background-color: rgb(214, 211, 213);
 }
 
@@ -208,23 +188,23 @@ body {
     grid-column-start: 2;
     justify-self: center;
     align-self: center;
-   
 
     display: grid;
     grid-template-columns: 1fr 1fr;
-    
+
     width: 80%;
     height: 60%;
 }
 
 .restart-button,
 .new-game-button {
-    width: 90%;
-    transition: transform 0.4s;
-    
+    justify-self: center;
+
+    width: 80%;
     font-size: 1.2rem;
     background-color: #fff;
-
+    border-radius: 5px;
+    transition: transform 0.4s;
 }
 
 .restart-button:hover {
@@ -237,7 +217,7 @@ body {
     transform: scale(1.05);
 }
 
-.box-game-info {  
+.box-game-info {
     justify-self: center;
     align-self: start;
     grid-row-start: 4;
@@ -255,11 +235,12 @@ body {
     text-align: center;
     color: var(--color-elements);
     background-color: var(--bg-color-elements);
+    padding: 0.5rem;
 }
 
 .box-game-info-text {
     text-align: center;
-    
+
 }
 
 .box-reference {
@@ -268,10 +249,8 @@ body {
     align-self: center;
     justify-self: end;
     padding-right: 2rem;
-    /* color: rgb(71, 71, 91); */
 }
 
 a {
-    /* text-decoration: none; */
     color: var(--color-link);
 }
