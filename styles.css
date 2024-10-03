@@ -5,7 +5,7 @@
 }
 
 :root {
-    --bg-color: #091540;
+    --bg-color: #091540; 
     --bg-color-elements: #fff;
     --color-elements: #000;
     --color-link: #fff;
@@ -25,7 +25,6 @@ body {
     grid-template-columns: 1fr 1fr 1fr;
 }
 
-/* written text: tic tac toe */
 .box-header {
     grid-row-start: 1;
     grid-column-start: 2;
@@ -37,8 +36,6 @@ body {
     border-bottom: 1px solid #fff;
 }
 
-/* improve player 1 section */
-/* should look better and less complicated*/
 .box-player1 {
     grid-row-start: 2;
     grid-column-start: 1;
@@ -122,6 +119,7 @@ body {
 .player1-wins-label,
 .player2-wins-label {
     align-self: end;
+    font-size: 1.5rem;
 }
 
 .player1-draws-label,
@@ -129,6 +127,7 @@ body {
     grid-row-start: 1;
     grid-column-start: 2;
     align-self: end;
+    font-size: 1.5rem;
 }
 
 .player1-lost-label,
@@ -136,6 +135,7 @@ body {
     grid-row-start: 1;
     grid-column-start: 3;
     align-self: end;
+    font-size: 1.5rem;
 }
 
 .player1-wins-value,
@@ -175,7 +175,6 @@ body {
     height: 90%;
 }
 
-/* buttons */
 .btn {
     background-color: white;
     font-size: 4rem;
@@ -279,7 +278,6 @@ a {
         grid-row-end: 4;
         grid-column-start: 2;
 
-
         width: 100%;
         height: 100%;
     }
@@ -327,6 +325,11 @@ a {
     .box-player1-top-section,
     .box-player2-top-section {
         grid-template-columns: 2fr 1fr;
+    }
+
+    .box-board {
+        height: 80%;
+        align-self: center;
     }
 
     .player1-wins-label,
