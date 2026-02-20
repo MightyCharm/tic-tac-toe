@@ -1,6 +1,4 @@
 {
-    "cSpell.ignoreWords": [
-        "gameboard",
-        "textbox"
-    ]
+  "cSpell.ignoreWords": ["gameboard", "textbox"],
+  "conventionalCommits.scopes": ["readme", "ui"]
 }
