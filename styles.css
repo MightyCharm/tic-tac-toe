@@ -5,6 +5,8 @@
 }
 
 :root {
+  --btn-color: white;
+  --btn-bg: hsl(194, 83%, 41%);
 }
 
 html,
@@ -15,6 +17,7 @@ body {
 body {
   display: grid;
   grid-template-rows: 100px 1fr 100px;
+  justify-items: center;
 
   font-family: "Orbitron", sans-serif;
   font-optical-sizing: auto;
@@ -27,59 +30,81 @@ body {
 .header {
   grid-column: 1 / -1;
 
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  justify-items: center;
+
   align-items: center;
   justify-content: center;
   padding: 1rem;
   color: white;
-  /* border: 2px solid rgb(0, 4, 255); */
 }
 
 .header > h1 {
+  grid-column: 2 / 3;
 }
 
 .header > p {
+  grid-column: 2 / 3;
+}
+
+.controls-sound {
+  grid-column: 3 / 4;
+  grid-row: 1 / 2;
+  justify-self: end;
+
+  display: flex;
+  gap: 0.2rem;
+  padding: 1rem;
+}
+
+.btn-music,
+.btn-sound {
+  border: none;
+  border-radius: 50%;
+  padding: 0.6rem;
+  color: var(--btn-color);
+  background-color: var(--btn-bg);
+  transition: background-color 0.3s ease;
 }
 
 .container {
   display: grid;
   grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto auto auto;
   justify-items: center;
   align-items: center;
-  gap: 1rem;
+  column-gap: 1rem;
 
   padding: 1rem;
   height: 100%;
+  max-width: 1000px;
+}
 
-  /* border: 1px solid red; */
+.box-player1,
+.box-player2 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  width: 100%;
+  min-width: 200px;
+  background-color: white;
 }
 
 .box-player1 {
   grid-column: 1 / 2;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
-  padding: 1rem;
-  background-color: white;
-  /* border: 2px solid red; */
 }
 
 .box-player2 {
   grid-column: 2 / 3;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
-  padding: 1rem;
-  background-color: white;
-  /* border: 2px solid red; */
 }
 
 .box-player-1-header,
 .box-player-2-header {
+  color: hsl(194, 83%, 41%);
 }
 
 .box-player1-mid-section,
@@ -101,8 +126,8 @@ body {
 .player2-button {
   border: none;
   padding: 0.4rem 1rem;
-  color: white;
-  background-color: hsl(194, 83%, 41%);
+  color: var(--btn-color);
+  background-color: var(--btn-bg);
   transition: background-color 0.3s ease;
 }
 
@@ -124,7 +149,6 @@ body {
 .player2-lost {
   display: flex;
   gap: 0.2rem;
-  /* border: 1px solid red; */
 }
 
 .player1-wins-label,
@@ -156,16 +180,15 @@ body {
 
 /* gameboard */
 .board {
-  grid-column: 1 / 3;
   grid-row: 1 / 2;
+  grid-column: 1 / 3;
+
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   grid-template-rows: 1fr 1fr 1fr;
 
-  width: 80%;
-  max-width: 500px;
-
-  /* border: 1px solid red; */
+  min-width: 250px;
+  max-width: 300px;
 }
 
 .btn {
@@ -178,40 +201,40 @@ body {
   transition: background-color 0.3s ease;
 }
 
-.game-controls {
+.box-game {
+  grid-column: 1 / 3;
+
   display: grid;
-  grid-template-columns: 2fr 2fr 1fr 1fr;
-  gap: 0.5rem;
+  grid-template-columns: 1fr 4fr;
+  align-items: center;
+  padding: 1rem;
   height: 100%;
   width: 100%;
-  padding: 1rem;
+  color: hsl(194, 83%, 41%);
   background-color: white;
+}
+
+.controls-game {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 100px;
 }
 
 .btn-restart,
-.btn-new-game,
-.btn-music,
-.btn-sound {
+.btn-new-game {
+  min-width: 95px;
   border: none;
-  color: white;
-  padding: 0.8rem 0.3rem;
-  background-color: hsl(194, 83%, 41%);
+  padding: 0.8rem;
+  color: var(--btn-color);
+  background-color: var(--btn-bg);
   transition: background-color 0.3s ease;
 }
 
-.box-game-info {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  width: 100%;
-  padding: 1rem 1rem;
-  background-color: hsl(194, 83%, 41%);
-  background-color: white;
-}
-
-.item-game-info-text {
-  text-align: start;
+.game-info-text {
+  padding: 1rem;
+  text-align: center;
+  font-size: 1.2rem;
 }
 
 .box-reference {
@@ -248,7 +271,45 @@ body {
 
 @media (min-width: 768px) {
   body {
-    border: 5px solid rgb(0, 110, 255);
+    border: 1px solid rgb(133, 20, 133);
+  }
+
+  .container {
+    grid-template-rows: auto auto;
+  }
+
+  .board {
+    grid-column: 1 / 2;
+    width: 400px;
+  }
+
+  .box-game {
+    grid-column: 2 / 3;
+    grid-row: 1 / 2;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    width: 400px;
+    height: 200px;
+  }
+
+  .controls-game {
+    flex-direction: row;
+    max-width: 100%;
+  }
+
+  .btn-restart {
+  }
+
+  .btn-new-game {
+  }
+
+  .box-player1,
+  .box-player2 {
+    max-width: 400px;
   }
 }
 
@@ -279,6 +340,11 @@ body {
   .btn-music:hover,
   .btn-sound:hover {
     background-color: hsl(219, 75%, 34%);
+    cursor: pointer;
+  }
+
+  .player1-input,
+  .player2-input {
     cursor: pointer;
   }
 }

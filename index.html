@@ -16,6 +16,23 @@
     <header class="header">
       <h1>TIC TAC TOE</h1>
       <p>The Odin Project</p>
+      <div class="controls-sound">
+        <button
+          id="btn-music-toggle"
+          class="btn-music"
+          aria-label="toggle music"
+        >
+          <i class="fas fa-music" aria-hidden="true"></i>
+        </button>
+
+        <button
+          id="btn-sound-toggle"
+          class="btn-sound"
+          aria-label="toggle sound"
+        >
+          <i class="fas fa-volume-up" aria-hidden="true"></i>
+        </button>
+      </div>
     </header>
     <main class="container">
       <section class="box-player1">
@@ -93,35 +110,22 @@
         </div>
       </section>
 
-      <div class="game-controls">
-        <button id="restart-btn" class="btn-restart" aria-label="restart game">
-          Restart
-        </button>
-        <button id="new-game-btn" class="btn-new-game" aria-label="new game">
-          New Game
-        </button>
-
-        <button
-          id="btn-music-toggle"
-          class="btn-music"
-          aria-label="toggle music"
-        >
-          <i class="fas fa-music" aria-hidden="true"></i>
-        </button>
-
-        <button
-          id="btn-sound-toggle"
-          class="btn-sound"
-          aria-label="toggle sound"
-        >
-          <i class="fas fa-volume-up" aria-hidden="true"></i>
-        </button>
-      </div>
-
-      <div class="box-game-info">
+      <div class="box-game">
+        <div class="controls-game">
+          <button
+            id="restart-btn"
+            class="btn-restart"
+            aria-label="restart game"
+          >
+            Restart
+          </button>
+          <button id="new-game-btn" class="btn-new-game" aria-label="new game">
+            New Game
+          </button>
+        </div>
         <div
           id="box-game-info-text"
-          class="item-game-info-text"
+          class="game-info-text"
           aria-live="polite"
         ></div>
       </div>
