@@ -12,9 +12,17 @@
 html,
 body {
   height: 100%;
+  width: 100%;
+  background-color: grey;
 }
 
 body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.container {
   display: grid;
   grid-template-rows: 120px 1fr 120px;
   justify-items: center;
@@ -23,6 +31,8 @@ body {
   font-weight: 400;
   font-style: normal;
   background-color: grey;
+  /* min-height: 100vh; */
+  max-width: 1000px;
 }
 
 .header,
@@ -37,7 +47,7 @@ body {
   grid-column: 1 / -1;
 
   display: grid;
-  grid-template-columns: 1fr 2fr 1fr;
+  grid-template-columns: 1fr 3fr 1fr;
   grid-template-rows: 1fr 1fr;
   justify-items: center;
   align-items: center;
@@ -59,8 +69,22 @@ body {
   justify-self: end;
 
   display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0rem;
+}
+
+.div-sound,
+.div-music {
+  flex: 1;
+  display: flex;
   gap: 0.2rem;
-  padding: 1rem;
+  flex-direction: column;
+}
+
+.text-btn-sound,
+.text-btn-music {
+  font-size: 0.6rem;
 }
 
 .btn-music,
@@ -73,7 +97,7 @@ body {
   transition: background-color 0.3s ease;
 }
 
-.container {
+.game-content {
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-template-rows: auto auto auto;
@@ -273,7 +297,7 @@ body {
 
 @media (min-width: 768px) {
   body {
-    border: 1px solid rgb(133, 20, 133);
+    /* border: 1px solid rgb(133, 20, 133); */
   }
 
   .container {
@@ -321,7 +345,7 @@ body {
 
 @media (min-width: 1200px) {
   body {
-    border: 5px solid rgb(16, 28, 197);
+    /* border: 5px solid rgb(16, 28, 197); */
   }
 }
 
