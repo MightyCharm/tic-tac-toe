@@ -113,6 +113,7 @@ connectGUI = (() => {
       game.renderText("winner");
       game.renderStatistics();
       game.disableBoardButtons();
+      sound.playWin();
       return;
     }
     // check for empty spot on board
@@ -124,6 +125,7 @@ connectGUI = (() => {
       game.renderText("boardFull");
       game.renderStatistics();
       game.disableBoardButtons();
+      sound.playDraw();
       return;
     }
     // render game info text
@@ -160,7 +162,7 @@ const game = (() => {
     }
   };
   // calls method to simulate someone typing text into the input fields
-  setInterval(animatePlaceholderText, 200);
+  setInterval(animatePlaceholderText, 300);
 
   const renderText = (optional = "") => {
     let playerSign = gameBoard.getLastSignSet();
@@ -395,19 +397,22 @@ const game = (() => {
       // if lastSign is "O" preview "X"
       switch (lastSign) {
         case "":
+          console.log("1");
           btn.textContent = "X";
           btn.style.opacity = opacity;
-          btn.style.color = "grey";
+          btn.style.color = "black";
           break;
         case "O":
+          console.log("2");
           btn.textContent = "X";
           btn.style.opacity = opacity;
-          btn.style.color = "grey";
+          btn.style.color = "black";
           break;
         case "X":
+          console.log("3");
           btn.textContent = "O";
           btn.style.opacity = opacity;
-          btn.style.color = "grey";
+          btn.style.color = "black";
           break;
         default:
           console.log("Shouldn't see me.");
@@ -418,7 +423,7 @@ const game = (() => {
 
   const removePreview = (btn) => {
     btn.style.opacity = 1;
-    btn.style.color = "#000";
+    btn.style.color = "black";
     // check if board array is empty at that space
     // get data-id from button(=equal to index in board array)
     let data_id = btn.getAttribute("data-id").split(" ");
@@ -874,6 +879,8 @@ factory function with arrow function syntax
 */
 const sound = (() => {
   const soundClick = new Audio("./sounds/click.wav");
+  const soundWin = new Audio("./sounds/win-sound.wav");
+  const soundDraw = new Audio("./sounds/draw.wav");
   const bgMusic = new Audio("./sounds/bg-music.mp3");
   const iconSound = document.querySelector(".icon-sound");
   const iconMusic = document.querySelector(".icon-bg-music");
@@ -885,12 +892,23 @@ const sound = (() => {
     soundClick.play();
   };
 
+  const playWin = () => {
+    if (isSoundMuted) return;
+    soundWin.play();
+  };
+
+  const playDraw = () => {
+    if (isSoundMuted) return;
+    soundDraw.play();
+  };
+
   const toggleSound = () => {
     isSoundMuted = !isSoundMuted;
   };
 
   const toggleMusic = () => {
     if (bgMusic.paused) {
+      bgMusic.loop = true;
       bgMusic.play();
     } else {
       bgMusic.pause();
@@ -915,6 +933,8 @@ const sound = (() => {
 
   return {
     playClick,
+    playWin,
+    playDraw,
     toggleSound,
     toggleMusic,
     updateSoundIcon,
