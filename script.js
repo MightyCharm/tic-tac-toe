@@ -2,6 +2,8 @@
 const player1Input = document.querySelector("#player1-input");
 const player2Input = document.querySelector("#player2-input");
 // get button elements to confirm player name and restart
+const btnMusic = document.querySelector("#btn-music-toggle");
+const btnSound = document.querySelector("#btn-sound-toggle");
 const player1Button = document.querySelector("#player1-button");
 const player2Button = document.querySelector("#player2-button");
 const restartButton = document.querySelector("#restart-btn");
@@ -17,34 +19,43 @@ const player2Lost = document.querySelector("#player2-lost-value");
 const gameRenderText = document.querySelector("#box-game-info-text");
 gameRenderText.textContent = "Player 1 it's your turn";
 
-// adding event listeners to the buttons that represent the board array in the GUI
+btnMusic.addEventListener("click", () => {
+  sound.playClick();
+  sound.playMusic();
+});
+
+btnSound.addEventListener("click", () => {
+  sound.playClick();
+});
+
 const buttons = document.querySelectorAll(".btn");
-// add event listener for feature show preview
 buttons.forEach((btn) => {
   btn.addEventListener("mouseover", (event) => {
     const btn = event.target;
     game.showPreview(btn);
   });
 });
-//add event listener for feature show preview
+
 buttons.forEach((btn) => {
   btn.addEventListener("mouseout", (event) => {
     const btn = event.target;
     game.removePreview(btn);
   });
 });
-// add event listener for running the game
+
 buttons.forEach((btn) => {
   btn.addEventListener("click", (event) => {
     const btn = event.target;
     connectGUI.playGame(btn);
-    game.removePreview(btn); // if player presses a button, the sign will be inserted, preview will disappear
+    // if player presses a button, the sign will be inserted, preview will disappear
+    game.removePreview(btn);
+    sound.playClick();
   });
 });
 
-// add event listeners so player can input their name and press "ok"
 player1Button.addEventListener("click", () => {
-  // if player didn't enter anything ignore button pressed
+  sound.playClick();
+  // if player didn't enter anything new ignore button pressed
   if (player1Input.value === player1.getName()) return;
   player1.setName(player1Input.value);
   // disable button and input field, so player name can only be entered one time during a game
@@ -54,9 +65,9 @@ player1Button.addEventListener("click", () => {
   game.renderText("player1Button");
 });
 
-// add event listeners so player can input their name and press "ok"
 player2Button.addEventListener("click", () => {
-  // if player didn't enter anything ignore button pressed
+  sound.playClick();
+  // if player didn't enter anything new ignore button pressed
   if (player2Input.value === player2.getName()) return;
   player2.setName(player2Input.value);
   // disable button and input field, so player name can only be entered one time during a game
@@ -66,13 +77,13 @@ player2Button.addEventListener("click", () => {
   game.renderText("player2Button");
 });
 
-// add event listener so it's possible to restart the game
 restartButton.addEventListener("click", () => {
+  sound.playClick();
   game.restartGame();
 });
 
-// add event listener for starting a complete new game
 newGameButton.addEventListener("click", () => {
+  sound.playClick();
   game.newGame();
 });
 
@@ -80,7 +91,7 @@ newGameButton.addEventListener("click", () => {
 factory function "connectGUI",
 responsible for checking player input and calling game object
 */
-connectGUI = (function () {
+connectGUI = (() => {
   //  represents the main loop of the game, "do" something if button is pressed
   const playGame = (btn) => {
     // check if button that was pressed is empty
@@ -122,7 +133,7 @@ connectGUI = (function () {
 factory function "game",
 responsible for the flow of the game
 */
-const game = (function () {
+const game = (() => {
   /*
     status is used to show the correct text, especial if some player wants to enter name and
     the game is in that moment in the end screen and not running anymore,
@@ -130,7 +141,6 @@ const game = (function () {
     variable gets changed from "connectGUI"(set to "false") and "newGame/restartGame"(set to "true")
     */
   let status = true;
-
   /* 
     feature animate placeholder text in player1 and player2 input fields
     */
@@ -443,7 +453,7 @@ const game = (function () {
 factory function "gameBoard",
 responsible for everything that has to do with the board array and the board gui
 */
-const gameBoard = (function () {
+const gameBoard = (() => {
   let lastSignSet = "";
   let board = [
     ["", "", ""],
@@ -806,7 +816,7 @@ const gameBoard = (function () {
 factory function player,
 manages player statistics and name
 */
-const player = function (playerSign) {
+const player = (playerSign) => {
   let name = "";
   let wins = 0;
   let draws = 0;
@@ -855,6 +865,33 @@ const player = function (playerSign) {
     getLost,
   };
 };
+
+/*
+factory function with arrow function syntax
+*/
+const sound = (() => {
+  const soundClick = new Audio("./sounds/click.wav");
+  const bgMusic = new Audio("./sounds/bg-music.mp3");
+
+  const playClick = () => {
+    soundClick.currentTime = 0;
+    soundClick.play();
+  };
+
+  const playMusic = () => {
+    if (bgMusic.paused) {
+      bgMusic.volume = 0.1;
+      bgMusic.currentTime = 0;
+      bgMusic.loop = true;
+      bgMusic.play();
+      return;
+    }
+    bgMusic.pause();
+    bgMusic.currentTime = 0;
+  };
+
+  return { playClick, playMusic };
+})();
 
 // Setup for first run
 // Create two player objects
