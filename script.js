@@ -2,8 +2,8 @@
 const player1Input = document.querySelector("#player1-input");
 const player2Input = document.querySelector("#player2-input");
 // get button elements to confirm player name and restart
-const btnMusic = document.querySelector("#btn-music-toggle");
-const btnSound = document.querySelector("#btn-sound-toggle");
+const btnSound = document.querySelector("#btn-toggle-sound");
+const btnMusic = document.querySelector("#btn-toggle-music");
 const player1Button = document.querySelector("#player1-button");
 const player2Button = document.querySelector("#player2-button");
 const restartButton = document.querySelector("#restart-btn");
@@ -19,13 +19,16 @@ const player2Lost = document.querySelector("#player2-lost-value");
 const gameRenderText = document.querySelector("#box-game-info-text");
 gameRenderText.textContent = "Player 1 it's your turn";
 
-btnMusic.addEventListener("click", () => {
-  sound.playClick();
-  sound.playMusic();
-});
-
 btnSound.addEventListener("click", () => {
   sound.playClick();
+  sound.toggleSound();
+  sound.updateSoundIcon();
+});
+
+btnMusic.addEventListener("click", () => {
+  sound.playClick();
+  sound.toggleMusic();
+  sound.updateMusicIcon();
 });
 
 const buttons = document.querySelectorAll(".btn");
@@ -872,25 +875,51 @@ factory function with arrow function syntax
 const sound = (() => {
   const soundClick = new Audio("./sounds/click.wav");
   const bgMusic = new Audio("./sounds/bg-music.mp3");
+  const iconSound = document.querySelector(".icon-sound");
+  const iconMusic = document.querySelector(".icon-bg-music");
+  let isSoundMuted = true;
 
   const playClick = () => {
+    if (isSoundMuted) return;
     soundClick.currentTime = 0;
     soundClick.play();
   };
 
-  const playMusic = () => {
-    if (bgMusic.paused) {
-      bgMusic.volume = 0.1;
-      bgMusic.currentTime = 0;
-      bgMusic.loop = true;
-      bgMusic.play();
-      return;
-    }
-    bgMusic.pause();
-    bgMusic.currentTime = 0;
+  const toggleSound = () => {
+    isSoundMuted = !isSoundMuted;
   };
 
-  return { playClick, playMusic };
+  const toggleMusic = () => {
+    if (bgMusic.paused) {
+      bgMusic.play();
+    } else {
+      bgMusic.pause();
+    }
+  };
+
+  const updateSoundIcon = () => {
+    iconSound.classList.remove("fa-volume-up", "fa-volume-down");
+    if (isSoundMuted) {
+      iconSound.classList.add("fa-volume-down");
+    } else {
+      iconSound.classList.add("fa-volume-up");
+    }
+  };
+
+  const updateMusicIcon = () => {
+    iconMusic.classList.remove("fa-pause", "fa-play");
+    if (bgMusic.paused) {
+      iconMusic.classList.add("fa-pause");
+    } else iconMusic.classList.add("fa-play");
+  };
+
+  return {
+    playClick,
+    toggleSound,
+    toggleMusic,
+    updateSoundIcon,
+    updateMusicIcon,
+  };
 })();
 
 // Setup for first run
