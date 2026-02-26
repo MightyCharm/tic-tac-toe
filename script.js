@@ -4,10 +4,10 @@ const player2Input = document.querySelector("#player2-input");
 // get button elements to confirm player name and restart
 const btnSound = document.querySelector("#btn-toggle-sound");
 const btnMusic = document.querySelector("#btn-toggle-music");
-const player1Button = document.querySelector("#player1-button");
-const player2Button = document.querySelector("#player2-button");
-const restartButton = document.querySelector("#restart-btn");
-const newGameButton = document.querySelector("#new-game-btn");
+const player1Btn = document.querySelector("#player1-button");
+const player2Btn = document.querySelector("#player2-button");
+const newRoundBtn = document.querySelector("#new-round-btn");
+const newGameBtn = document.querySelector("#new-game-btn");
 // get elements for the statistic, win, draws and lost
 const player1Wins = document.querySelector("#player1-wins-value");
 const player1Draws = document.querySelector("#player1-draws-value");
@@ -56,36 +56,36 @@ buttons.forEach((btn) => {
   });
 });
 
-player1Button.addEventListener("click", () => {
+player1Btn.addEventListener("click", () => {
   sound.playClick();
   // if player didn't enter anything new ignore button pressed
   if (player1Input.value === player1.getName()) return;
   player1.setName(player1Input.value);
   // disable button and input field, so player name can only be entered one time during a game
-  player1Button.disabled = true;
+  player1Btn.disabled = true;
   player1Input.disabled = true;
   // render name to the screen
-  game.renderText("player1Button");
+  game.renderText("player1Btn");
 });
 
-player2Button.addEventListener("click", () => {
+player2Btn.addEventListener("click", () => {
   sound.playClick();
   // if player didn't enter anything new ignore button pressed
   if (player2Input.value === player2.getName()) return;
   player2.setName(player2Input.value);
   // disable button and input field, so player name can only be entered one time during a game
-  player2Button.disabled = true;
+  player2Btn.disabled = true;
   player2Input.disabled = true;
   // render name to the screen
-  game.renderText("player2Button");
+  game.renderText("player2Btn");
 });
 
-restartButton.addEventListener("click", () => {
+newRoundBtn.addEventListener("click", () => {
   sound.playClick();
   game.restartGame();
 });
 
-newGameButton.addEventListener("click", () => {
+newGameBtn.addEventListener("click", () => {
   sound.playClick();
   game.newGame();
 });
@@ -165,7 +165,7 @@ const game = (() => {
   setInterval(animatePlaceholderText, 300);
 
   const renderText = (optional = "") => {
-    let playerSign = gameBoard.getLastSignSet();
+    let currentPlayerSign = gameBoard.getLastSignSet();
     let player1Name = player1.getName();
     let player2Name = player2.getName();
     let textOutput = "";
@@ -177,16 +177,16 @@ const game = (() => {
       player2Name = "Player 2";
     }
 
-    if (optional === "player1Button" || optional === "player2Button") {
+    if (optional === "player1Btn" || optional === "player2Btn") {
       // check if status is true(=game is running) or false (=game over)
       // check which player turn it is to choose what to render
       if (getStatus() === true) {
         // Player 1 turn
-        if (playerSign === "O") {
+        if (currentPlayerSign === "O") {
           textOutput = `${player1Name} it's your turn`;
         }
         // Player 2 turn
-        else if (playerSign === "X") {
+        else if (currentPlayerSign === "X") {
           textOutput = `${player2Name} it's your turn`;
         }
         // first turn of the game, always Player 1
@@ -200,7 +200,7 @@ const game = (() => {
     } else if (optional === "winner") {
       let signWinner;
       textOutput = "Congratulation, ";
-      signWinner = gameBoard.getLastSignSet();
+      signWinner = currentPlayerSign;
       switch (signWinner) {
         case "X":
           textOutput += `${player1Name}`;
@@ -216,11 +216,16 @@ const game = (() => {
     } else if (optional === "boardFull") {
       textOutput = "Board is full. Draw!";
     } else if (optional === "restart" || optional === "new-game") {
-      textOutput = `${player1Name} it's your turn`;
+      if (currentPlayerSign === "" || currentPlayerSign === "O") {
+        textOutput = player1Name;
+      } else {
+        textOutput = player2Name;
+      }
+      textOutput += " it's your turn";
     }
     // normal call if game is running
     else if (optional === "") {
-      let playerSign = gameBoard.getLastSignSet();
+      let playerSign = currentPlayerSign;
       if (playerSign === "O") {
         textOutput += player1Name;
       } else {
@@ -233,7 +238,6 @@ const game = (() => {
 
   const restartGame = () => {
     gameBoard.clearBoardArray();
-    gameBoard.clearLastSignSet();
     gameBoard.clearSignsFromButtons();
     gameBoard.clearMarkedWinner();
     game.setStatus(true);
@@ -244,13 +248,13 @@ const game = (() => {
 
   const newGame = () => {
     gameBoard.clearBoardArray();
-    gameBoard.clearLastSignSet();
     gameBoard.clearSignsFromButtons();
     gameBoard.clearMarkedWinner();
+    gameBoard.clearLastSignSet();
     player1Input.disabled = false;
     player2Input.disabled = false;
-    player1Button.disabled = false;
-    player2Button.disabled = false;
+    player1Btn.disabled = false;
+    player2Btn.disabled = false;
     // clear names
     player1.setName("");
     player2.setName("");
@@ -397,19 +401,16 @@ const game = (() => {
       // if lastSign is "O" preview "X"
       switch (lastSign) {
         case "":
-          console.log("1");
           btn.textContent = "X";
           btn.style.opacity = opacity;
           btn.style.color = "black";
           break;
         case "O":
-          console.log("2");
           btn.textContent = "X";
           btn.style.opacity = opacity;
           btn.style.color = "black";
           break;
         case "X":
-          console.log("3");
           btn.textContent = "O";
           btn.style.opacity = opacity;
           btn.style.color = "black";
@@ -477,15 +478,15 @@ const gameBoard = (() => {
     let index_2 = data_id[1];
     if (lastSignSet === "") {
       btn.textContent = player1.getSign();
-      lastSignSet = player1.getSign();
+      setLastSign(player1.getSign());
       board[index_1][index_2] = player1.getSign();
     } else if (lastSignSet === "X") {
       btn.textContent = player2.getSign();
-      lastSignSet = player2.getSign();
+      setLastSign(player2.getSign());
       board[index_1][index_2] = player2.getSign();
     } else {
       btn.textContent = player1.getSign();
-      lastSignSet = player1.getSign();
+      setLastSign(player1.getSign());
       board[index_1][index_2] = player1.getSign();
     }
   };
@@ -498,12 +499,16 @@ const gameBoard = (() => {
     ];
   };
 
+  const setLastSign = (sign) => {
+    lastSignSet = sign;
+  };
+
   const getLastSignSet = () => {
     return lastSignSet;
   };
 
   const clearLastSignSet = () => {
-    lastSignSet = "";
+    setLastSign("");
   };
 
   // get variable board
@@ -806,7 +811,6 @@ const gameBoard = (() => {
     setBoardButtons,
     getBoardArray,
     clearBoardArray,
-    clearLastSignSet,
     outputBoardArray,
     checkRows,
     checkColumns,
@@ -814,6 +818,7 @@ const gameBoard = (() => {
     checkCrossRightToLeft,
     checkForEmptySpot,
     getLastSignSet,
+    clearLastSignSet,
     clearSignsFromButtons,
     markWinner,
     clearMarkedWinner,
@@ -908,6 +913,7 @@ const sound = (() => {
 
   const toggleMusic = () => {
     if (bgMusic.paused) {
+      bgMusic.volume = 0.3;
       bgMusic.loop = true;
       bgMusic.play();
     } else {
