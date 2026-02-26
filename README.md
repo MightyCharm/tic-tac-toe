@@ -5,10 +5,14 @@ Project: Tic Tac Toe (The Odin Project: JavaScript Course)
 ## ℹ️ Description
 
 The first goal of the project was to get the game running in the console and then connect everything with an GUI.
-This program uses factory functions for most of the logic. Also, I tried to have less logic as possible outside
-of these functions.
+This program uses factory functions for most of the logic. Also, I tried to have less logic as possible outside of these functions.
 
 ## ✅ Features
+
+- Score tracking
+- Custom player names
+- Sound effects and background music (toggle on/off)
+- Player alternation between rounds
 
 ## ⚙️ Tech Stack
 
@@ -24,6 +28,8 @@ of these functions.
 https://mightycharm.github.io/tic-tac-toe/
 
 ## 📸 Screenshots
+
+![Tic Tac Toe Game](images/screenshot.png)
 
 ## Reference
 
